@@ -33,3 +33,4 @@ LocalizeString event will remove changes unless configured or turned off.
 DataConfigPanel:
 Found on the Root of the Panel.
 Master location of the SmartDataContainerReferenceListSet, in other words, all the data required for the panel.
+Manages the creation of eveything below the panels "Content" Gameobject
