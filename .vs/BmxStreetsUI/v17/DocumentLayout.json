@@ -1,0 +1,101 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\grindposepanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:grindposepanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\api.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:api.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\notes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:notes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Notes.cs",
+              "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\Notes.cs",
+              "RelativeDocumentMoniker": "Notes.cs",
+              "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\Notes.cs",
+              "RelativeToolTip": "Notes.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-27T20:35:45.559Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GrindPosePanel.cs",
+              "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\GrindPosePanel.cs",
+              "RelativeDocumentMoniker": "GrindPosePanel.cs",
+              "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\GrindPosePanel.cs",
+              "RelativeToolTip": "GrindPosePanel.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwIkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-27T20:32:33.012Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UIPanel.cs",
+              "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIPanel.cs",
+              "RelativeDocumentMoniker": "UIPanel.cs",
+              "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIPanel.cs",
+              "RelativeToolTip": "UIPanel.cs",
+              "ViewState": "AQIAADwAAAAAAAAAAAAYwN4AAAAzAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-27T20:32:25.762Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "API.cs",
+              "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\API.cs",
+              "RelativeDocumentMoniker": "API.cs",
+              "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\API.cs",
+              "RelativeToolTip": "API.cs",
+              "ViewState": "AQIAACAAAAAAAAAAAAAwwCoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-27T20:32:24.455Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UIManager.cs",
+              "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIManager.cs",
+              "RelativeDocumentMoniker": "UIManager.cs",
+              "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIManager.cs",
+              "RelativeToolTip": "UIManager.cs",
+              "ViewState": "AQIAADUAAAAAAAAAAAAgwE8AAAA/AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-27T20:32:01.042Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
