@@ -25,8 +25,6 @@ using Il2CppMG_Core.MG_SmartData.SaveLoad;
 
 namespace BmxStreetsUI
 {
-
-
     public static class BuildInfo
     {
         public const string Name = "TestMod"; // Name of the Mod.  (MUST BE SET)

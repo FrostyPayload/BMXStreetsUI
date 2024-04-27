@@ -116,7 +116,6 @@ namespace BmxStreetsUI
             }
 
         }
-
         void OnOpen()
         {
             Debug.Log("FrostyUI panel opening");

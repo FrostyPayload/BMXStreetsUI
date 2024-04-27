@@ -14,10 +14,7 @@ namespace BmxStreetsUI
 {
     public class GrindPosePanel
     {
-        public void SetupPanel()
-        {
-
-        }
+       
         BMXFreeformPoseData[] poses;
         GameObject myBmx, ghost, bmx;
         Dictionary<GrindType, SmartDataContainerReferenceList> grindDataDict;
