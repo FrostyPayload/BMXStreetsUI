@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BmxStreetsUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f039c26b522f984484e150ccaf5cdea9586edb81")]
 [assembly: System.Reflection.AssemblyProductAttribute("BmxStreetsUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BmxStreetsUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

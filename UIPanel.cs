@@ -28,50 +28,53 @@ namespace BmxStreetsUI
         /// An object that sticks around through duplication, contains prefabs of the slider,button etc.
         /// Retreived through DataConfigPanel present on the panel object
         /// </summary>
-        protected SmartUIPaletteData pallete;
+        public SmartUIPaletteData pallete;
         /// <summary>
         /// References a list of SmartDataContainerReferenceList, Each list turns into the options on a tab
         /// </summary>
-        protected SmartDataContainerReferenceListSet listSet;
+        public SmartDataContainerReferenceListSet listSet;
         /// <summary>
         /// talks to the system to turn on and off etc, registers itself by looking for parent
         /// </summary>
-        protected MGMenu menu;
+        public MGMenu menu;
         /// <summary>
         /// The duplicate objects have open and close triggers mapped to the original objects
         /// </summary>
-        protected Action<BaseEventData> openMenuTrigger, CloseMenu;
-        protected Action closeMenuTrigger;
-
+        public Action<BaseEventData> openMenuTrigger, CloseMenu;
+        public Action closeMenuTrigger;
         Action<object> dataChangeCallbackData; // the callback we want updates through when using UI
 
-        protected string TabName = "FrostyUITab";
-        protected string PanelName = "FrostyUI panel";
-
-        public void Awake()
+        public string TabName = "FrostyUITab";
+        public string PanelName = "FrostyUI panel";
+        public void Init()
         {
-            Debug.Log("StreetsUI Panel awake");
-
+            listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
+        }
+        /// <summary>
+        /// Run once data is populated
+        /// </summary>
+        public void RunSetup()
+        {
+            Debug.Log("StreetsUI Panel Setting up");
 
             var content = transform.FindDeepChild("Content");
             foreach (var trans in content.GetComponentsInChildren<Transform>(true))
             {
                 if (trans.name.ToLower().Contains("data panel"))
                 {
-                    //Destroy(trans.gameObject);
+                    Destroy(trans.gameObject);
                 }
             }
 
             if (tab == null)
             {
-                Debug.Log("Tab is null in Grinds Setup");
+                Debug.Log("Tab is null in UIPanel Setup");
                 return;
             }
             if (!GetReferences()) { Debug.Log("References failed"); return; }
             SetupTriggers();
-            if (!SetupTab()) { return; }
-            SetupData();
-            SetupConfigPanel("Grind Poses");
+            if (!SetupTab(TabName)) { return; }
+            SetupConfigPanel(PanelName);
             SetupPanel();
             SetDataCallbacks();
             var saveLoad = Singleton<SaveLoadManager>.GetInstance();
@@ -80,7 +83,6 @@ namespace BmxStreetsUI
                 Debug.Log($"Save load system found, adding data");
                 saveLoad.dataList.Add(listSet);
             }
-
         }
         void SetupTriggers()
         {
@@ -174,25 +176,21 @@ namespace BmxStreetsUI
             gameObject.name = PanelName;
             transform.SetParent(mainCanvas.transform, false);
             if (menu == null) { Debug.Log($"No MGmenu"); return; }
-            //menu.Awake();
-            //menu.OnEnterOpen.RemoveAllListeners();
-            //if(menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
-            //menu.Init();
+            menu.Awake();
+            menu.OnEnterOpen.RemoveAllListeners();
+            if(menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
+            menu.Init();
 
             //UIHorizontalSelectorSmartSetBehaviour selector = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
             //selector._DataReferenceSets = listSet;
         }
-        protected virtual void SetupData()
-        {
-           // do all smartdata setup
-        }
-
+        
         void SetupConfigPanel(string PanelLabel)
         {
             if (config != null)
             {
                 Debug.Log("Setting up config panel");
-                config.panelLabel.text = PanelLabel;
+                config.panelLabel.text = TabName;
                 config.configDatas = listSet;
                 config.configDatas_DevAlt = null;
                 config._hasDevAltData = false;
@@ -208,13 +206,13 @@ namespace BmxStreetsUI
                 config.Validate();
             }
         }
-        bool SetupTab()
+        bool SetupTab(string tabName)
         {
             if (tab == null) { Debug.Log("System tab not found"); return false; }
             // configure clones settings tab
             tab.name = "FrostyUIPanel";
             tab.GetComponent<LocalizeStringEvent>().enabled = false;
-            tab.GetComponentInChildren<TextMeshProUGUI>().text = "Grinds";
+            tab.GetComponentInChildren<TextMeshProUGUI>().text = tabName;
             tab.transform.SetParent(tabParent.transform, false);
             return true;
         }
@@ -235,11 +233,12 @@ namespace BmxStreetsUI
 
             }
         }
+
         /// <summary>
         /// Should be receiving on this when smartdata is changed, rogue event with null reference in the way?
         /// </summary>
         /// <param name="value"></param>
-        public void Callback(object value)
+        protected virtual void Callback(object value)
         {
             if (value == null) { Debug.Log("Received null in callback"); return; }
             Debug.Log($"Receiving callback : object = {value.GetType().ToString()}");
@@ -248,8 +247,5 @@ namespace BmxStreetsUI
         }
 
     }
-    public enum GrindType
-    {
-        smith, feeble, pegs, crook, crank, luce, unluce, magiccarpet, ice, tooth
-    }
+
 }

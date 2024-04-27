@@ -1,4 +1,6 @@
 ﻿using Il2Cpp;
+using Il2CppInterop.Runtime.Injection;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,8 +12,12 @@ using UnityEngine.Events;
 
 namespace BmxStreetsUI
 {
-    public class GrindPosePanel : UIPanel
+    public class GrindPosePanel
     {
+        public void SetupPanel()
+        {
+
+        }
         BMXFreeformPoseData[] poses;
         GameObject myBmx, ghost, bmx;
         Dictionary<GrindType, SmartDataContainerReferenceList> grindDataDict;
@@ -31,7 +37,7 @@ namespace BmxStreetsUI
         {
             var character = GameObject.Find("Player Components");
             if (character == null || bmx == null) { Debug.Log("No character or bike found in FrostyUI.spawncharacter"); return; }
-            if (ghost == null) ghost = Instantiate(character);
+           // if (ghost == null) ghost = Instantiate(character);
             ghost.name = "FrostyGrindMenuGhostCharacter";
 
             var toDestroy = new List<GameObject>();
@@ -58,7 +64,7 @@ namespace BmxStreetsUI
             }
             while (toDestroy.Count > 0)
             {
-                Destroy(toDestroy[0]);
+                //Destroy(toDestroy[0]);
             }
 
         }
@@ -72,9 +78,10 @@ namespace BmxStreetsUI
                 myBmx = body;
             }
         }
-        protected override void SetupData()
+        public void SetupData(UIPanel panel)
         {
-            listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
+            var listSet = panel.listSet;
+            if(listSet == null) { Debug.LogError($"Listset is null in GrindposePanel setup"); return; }
             grindDataDict = new Dictionary<GrindType, SmartDataContainerReferenceList>();
             foreach (var grindType in typeof(GrindType).GetEnumValues())
             {
@@ -127,20 +134,19 @@ namespace BmxStreetsUI
 
             listSet.name = "GrindsReferenceSetObject";
             listSet.SetName = "GrindsReferenceSet";
-
-
             listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
             foreach (var item in grindDataDict.Keys)
             {
                 listSet._DataRefLists.Add(grindDataDict[item]);
             }
+            panel.TabName = "Grinds";
         }
         void CreateDatas(SmartDataContainer container, GrindType grindType, string grindName)
         {
             var BarsAngleSmartData = ScriptableObject.CreateInstance<SmartData_Float>();
-            //BarsAngleSmartData.OnDataChangeableChanged = new UnityEvent();
-            //BarsAngleSmartData.DataChangeableCallback = new BoolCallBackEvent();
-            //BarsAngleSmartData.EnableDataChangeable();
+            BarsAngleSmartData.OnDataChangeableChanged = new UnityEvent();
+            BarsAngleSmartData.DataChangeableCallback = new BoolCallBackEvent();
+            BarsAngleSmartData.EnableDataChangeable();
             var barsAngleSmartType = BarsAngleSmartData._mData;
             var BarsAngleSmartStruct = new SmartDataFloatStuct();
             BarsAngleSmartStruct.SetMin(-90);

@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\grindposepanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:grindposepanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|solutionrelative:uipanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F6FCB4EC-6673-4202-816A-A67D29101D0C}|BmxStreetsUI.csproj|c:\\users\\frostyp\\github\\bmxstreetsui\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -30,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
@@ -46,25 +46,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "GrindPosePanel.cs",
               "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\GrindPosePanel.cs",
               "RelativeDocumentMoniker": "GrindPosePanel.cs",
               "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\GrindPosePanel.cs",
               "RelativeToolTip": "GrindPosePanel.cs",
-              "ViewState": "AQIAABEAAAAAAAAAAAAQwIkAAAAAAAAA",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAqwI0AAAAlAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-27T20:32:33.012Z"
+              "WhenOpened": "2024-04-27T20:32:33.012Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "UIPanel.cs",
               "DocumentMoniker": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIPanel.cs",
               "RelativeDocumentMoniker": "UIPanel.cs",
               "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIPanel.cs",
               "RelativeToolTip": "UIPanel.cs",
-              "ViewState": "AQIAADwAAAAAAAAAAAAYwN4AAAAzAAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAAAowLsAAAAwAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-27T20:32:25.762Z",
               "EditorCaption": ""
@@ -77,9 +78,10 @@
               "RelativeDocumentMoniker": "API.cs",
               "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\API.cs",
               "RelativeToolTip": "API.cs",
-              "ViewState": "AQIAACAAAAAAAAAAAAAwwCoAAAAAAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAACoAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-27T20:32:24.455Z"
+              "WhenOpened": "2024-04-27T20:32:24.455Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -89,9 +91,10 @@
               "RelativeDocumentMoniker": "UIManager.cs",
               "ToolTip": "C:\\Users\\Frostyp\\GitHub\\BMXStreetsUI\\UIManager.cs",
               "RelativeToolTip": "UIManager.cs",
-              "ViewState": "AQIAADUAAAAAAAAAAAAgwE8AAAA/AAAA",
+              "ViewState": "AQIAAGAAAAAAAAAAAAAuwIkAAAAoAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-27T20:32:01.042Z"
+              "WhenOpened": "2024-04-27T20:32:01.042Z",
+              "EditorCaption": ""
             }
           ]
         }

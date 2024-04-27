@@ -50,6 +50,7 @@ namespace BmxStreetsUI
 
 
         UIPanel GrindTabTest;
+        GrindPosePanel GrindsPanel;
 
         public override void OnInitializeMelon()
         {
@@ -128,11 +129,13 @@ namespace BmxStreetsUI
                     LoggerInstance.Msg("settings is null");
                     return;
                 }
-
-                GrindTabTest = duplicateSettingPanel.AddComponent<UIPanel>();
+                GrindsPanel = new GrindPosePanel();
+                GrindTabTest = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
                 GrindTabTest.tab = duplicateTab;
                 GrindTabTest.tabParent = systemSettingsTab.transform.parent.gameObject;
-                GrindTabTest.Awake();
+                GrindTabTest.Init();
+                GrindsPanel.SetupData(GrindTabTest);
+                GrindTabTest.RunSetup();
                 // perhaps want to prefab the completed setup and keep it aside
 
                 LoggerInstance.Msg("Setup complete");
