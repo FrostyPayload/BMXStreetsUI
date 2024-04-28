@@ -1,4 +1,4 @@
-﻿namespace BmxStreetsUI
+﻿namespace BmxStreetsUI.Components
 {
     public class Constants
     {

@@ -17,18 +17,14 @@ namespace BmxStreetsUI.Components
     {
         public virtual bool Create(CustomMenu newmenu)
         {
-            GameObject systemSettingsPanel = GameObject.Find("System Tab Settings");
+            GameObject systemSettingsPanel = GameObject.Find(Constants.SystemTabSettings);
             var systemSettingsTab = GameObject.Find("SYSTEM-TAB");
             if (systemSettingsPanel == null) // does it need to be active for .Find()
             {
-                foreach (var menu in UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                {
-                    if (menu.gameObject.name.ToLower().Contains("system tab settings"))
-                    {
-                        systemSettingsPanel = menu.gameObject;
-                        break;
-                    }
-                }
+                systemSettingsPanel = UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                                                        .Where(menu => menu.gameObject.name.ToLower()
+                                                                                           .Contains(Constants.SystemTabSettings))
+                                                        .FirstOrDefault().gameObject;
             }
 
             if (systemSettingsPanel != null && systemSettingsTab != null)
