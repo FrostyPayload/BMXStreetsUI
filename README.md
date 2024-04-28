@@ -5,7 +5,8 @@
 TODO
 
 ### Only tested Sliders
-setup and test button, steppedInt, toggle
+setup and test button, steppedInt, toggle.
+
 SteppedInts should be able to show text? - windowed = 1, fullscreen = 2
 
 ### Entry Point
