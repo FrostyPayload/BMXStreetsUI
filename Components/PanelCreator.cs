@@ -1,14 +1,8 @@
 ﻿using Il2Cpp;
 using Il2CppMG_UI.MenuSytem;
 using Il2CppTMPro;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.Localization.Components;
 
 namespace BmxStreetsUI.Components
@@ -44,8 +38,8 @@ namespace BmxStreetsUI.Components
                 }
                 duplicateTab.transform.SetParent(systemSettingsTab.transform.parent, false);
                 duplicateTab.GetComponent<LocalizeStringEvent>().enabled = false;
-                duplicateTab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.panelTitle;
-                duplicateTab.name = newmenu.panelTitle + "Object";
+                duplicateTab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.TabTitle;
+                duplicateTab.name = newmenu.TabTitle + "Object";
 
                 var smartui = duplicateTab.GetComponent<SmartUIBehaviour>();
                 smartui.UnRegisterEvents();
@@ -57,15 +51,15 @@ namespace BmxStreetsUI.Components
                 UIPanel.RunSetup();
                 return true;
             }
-            Log.Msg($"Failed to create {newmenu.panelTitle} UI");
+            Log.Msg($"Failed to create {newmenu.TabTitle} UI");
             return false;
         }
 
         public virtual void SetupData(UIPanel panel, CustomMenu menu)
         {
-            Log.Msg($"Setting up {menu.panelTitle} UI Data");
-            var listSet = SmartDataManager.CreateNewSet(menu.panelTitle);
-            if (listSet == null) { Log.Msg($"ListSet is null in {menu.panelTitle} setup", true); return; }
+            Log.Msg($"Setting up {menu.TabTitle} UI Data");
+            var listSet = SmartDataManager.CreateNewSet(menu.TabTitle);
+            if (listSet == null) { Log.Msg($"ListSet is null in {menu.TabTitle} setup", true); return; }
             
             // populate list with every custommenugroup, setting up each options data and callbacks
             listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
@@ -84,20 +78,19 @@ namespace BmxStreetsUI.Components
                 container.ValidateList();
                 listSet._DataRefLists.Add(GroupOptions);
             }
-            panel.PanelName = menu.panelTitle;
+            panel.PanelName = menu.TabTitle;
             panel.listSet = listSet;
         }
         
         public virtual void SetupOption(CustomMenuOption option, SmartDataContainer container)
         {
-            var data = SmartDataManager.CreateSmartDatas(option);
-            data._dataUIStyle = option.uiStyle;
+            var data = SmartDataManager.CreateSmartData(option);
             data.OnDataChangeableChanged = new UnityEvent();
             data.DataChangeableCallback = new BoolCallBackEvent();
             data.OnValueChanged_DataValue = new SmartDataEvent();
-            data.OnValueChanged_DataValue.AddListener(option.callback);
+            data.OnValueChanged_DataValue.AddListener(option.ValueCallBack);
             data.OnValueChanged = new UnityEvent();
-           // data.OnValueChanged.AddListener(option.voidCallBack);
+            data.OnValueChanged.AddListener(option.VoidCallBack);
             data.EnableDataChangeable();
             container._smartDatas.Add(data);
         }

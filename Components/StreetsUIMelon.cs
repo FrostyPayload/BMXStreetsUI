@@ -1,25 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MelonLoader;
-using Il2Cpp;
+﻿using MelonLoader;
 using UnityEngine;
-using UnityEngine.Events;
-using Il2CppMG_Gameplay.UI;
-using Il2CppMG_UI.MenuSytem;
-using Il2CppMG_UI;
-using Il2CppMichsky.UI.ModernUIPack;
-using Il2CppTMPro;
-using UnityEngine.EventSystems;
-using System.Reflection;
-using Il2CppMG_PlaybackSystem;
-using Il2CppSystem.Reflection;
-using UnityEngine.Localization.SmartFormat.PersistentVariables;
-using UnityEngine.Localization;
-using Il2CppMG_Core.MG_SmartData.SaveLoad;
-using Il2CppInterop.Runtime;
 
 [assembly: MelonInfo(typeof(BmxStreetsUI.Components.StreetsUIMelon), "BMX Streets UI", "version", "Author Name")]
 [assembly: MelonGame()]
@@ -71,10 +51,8 @@ namespace BmxStreetsUI.Components
                 // need to hook in when menu is open to find the objects i want to duplicate,
                 // locate an object we can rely on in an onsceneload instead, "PauseMenu"?
                 // Setup();
-
                 MockAPICall();
             }
-
         }
         void MockAPICall()
         {
@@ -82,24 +60,46 @@ namespace BmxStreetsUI.Components
 
             var mygroup = new CustomMenuOptionGroup("My menu");
 
-            var myoption = new Slider();
-            myoption.title = "MyValue";
-            myoption.max = 50;
-            myoption.min = 0;
-            myoption.SetCallBack(Callback);
+            var myslider = new Slider("MySlider",0,50);
+            myslider.SetCallBack(MyFloatCallback);
 
-            mygroup.title = "custom menu";
-            mygroup.options.Add(myoption);
+            var myButton = new Button("Mybutton","My Buttons Description");
+            myButton.SetCallBack(MyCallback);
+
+            var myToggle = new Toggle("MyToggle");
+            myToggle.SetCallBack(MyBoolCallback);
+
+            var mysteppedInt = new SteppedInt("MySteppedInt");
+            mysteppedInt.choices.Add("Choice one");
+            mysteppedInt.choices.Add("Choice two");
+            mysteppedInt.choices.Add("Choice three");
+            mysteppedInt.SetCallBack(MyIntCallback);
+
+            mygroup.options.Add(myslider);
+            mygroup.options.Add(myButton);
+            mygroup.options.Add(myToggle);
+            mygroup.options.Add(mysteppedInt);
 
             groups.Add(mygroup);
 
             var mymenu = new CustomMenu("MyTab", groups);
             API.AddMenu(mymenu);
         }
-        public void Callback(Il2CppSystem.Object obj)
+        void MyFloatCallback(float value)
         {
-            // better to be providing specific callbacks to users, Action<float> etc if possible
-            Log.Msg($"Received callback, Type = {obj.GetIl2CppType().ToString()}");
+            Log.Msg($"MyFloatCallBack : {value}");
+        }
+        void MyBoolCallback(bool value)
+        {
+            Log.Msg($"MyBoolCallBack : {value}");
+        }
+        void MyIntCallback(int value)
+        {
+            Log.Msg($"MyIntCallBack : {value}");
+        }
+        public void MyCallback()
+        {
+            Log.Msg("My Callback");   
         }
        
         public override void OnApplicationQuit() // Runs when the Game is told to Close.

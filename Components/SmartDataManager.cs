@@ -4,9 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,26 +11,25 @@ namespace BmxStreetsUI.Components
 {
     internal class SmartDataManager
     {
-        public static SmartData CreateSmartDatas(CustomMenuOption option)
+        public static SmartData CreateSmartData(CustomMenuOption option)
         {
-            switch (option.uiStyle)
+            switch (option.UIStyle)
             {
-                case SmartData.DataUIStyle.Slider:
-                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option);
-                case SmartData.DataUIStyle.Stepped:
-                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Stepped);
-                case SmartData.DataUIStyle.Button:
+                case UIStyle.Slider:
+                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
+                case UIStyle.SteppedInt:
+                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                case UIStyle.Button:
                     return SetupButton(ScriptableObject.CreateInstance<SmartData_Button>(), option);
-                case SmartData.DataUIStyle.Stat:
-                    return ScriptableObject.CreateInstance<Stat>();
-                case SmartData.DataUIStyle.Custom:
-                    return ScriptableObject.CreateInstance<SmartData_Button>();
+                case UIStyle.Toggle:
+                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
 
             }
             return ScriptableObject.CreateInstance<SmartData_Float>();
         }
-        static SmartData SetupSlider(SmartData_Float data, CustomMenuOption option, SmartDataFloatStuct.DataStyle style = SmartDataFloatStuct.DataStyle.Free)
+        static SmartData SetupSlider(SmartData_Float data, CustomMenuOption option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
         {
+            data._dataUIStyle = uiStyle;
             var SmartType = data._mData;
             var FloatData = new SmartDataFloatStuct();
             FloatData.SetMin(option.GetMin());
@@ -49,6 +45,17 @@ namespace BmxStreetsUI.Components
             SmartType._identifyer = option.title;
             data._description = option.description;
             data.SetData(SmartType);
+
+            if(uiStyle == SmartData.DataUIStyle.Stepped)
+            {
+                data.steppedLabelList = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
+                data.steppedLabelList.categoryName = option.title;
+                var LabelList = option.GetLabels();
+                data.OnSteppedLabelListChanged = new UnityEvent();
+                data.SetSteppedLabelListData(LabelList);
+                data.MatchMinMaxToSteppedList();
+            }
+
             return data;
         }
         static SmartData SetupButton(SmartData_Button data, CustomMenuOption option)
@@ -56,7 +63,7 @@ namespace BmxStreetsUI.Components
             var SmartType = data._mData;
             var btnData = new SmartDataButtonStuct();
             data._mData._value = btnData;
-
+            data._dataUIStyle = SmartData.DataUIStyle.Button;
             SmartType._value = btnData;
             data.name = option.title + "Object";
             SmartType._label = option.title;

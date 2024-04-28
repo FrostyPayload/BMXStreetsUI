@@ -1,13 +1,13 @@
 ﻿using Il2Cpp;
 using Il2CppMG_Core.MG_SmartData.SaveLoad;
 using Il2CppMG_UI.MenuSytem;
-using Il2CppTMPro;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine.Localization.Components;
+using Il2CppMichsky.UI.ModernUIPack;
 
 namespace BmxStreetsUI.Components
 {
@@ -17,7 +17,6 @@ namespace BmxStreetsUI.Components
         public UIPanel(IntPtr ptr) : base(ptr) { }
         public UIPanel() : base(ClassInjector.DerivedConstructorPointer<UIPanel>()) => ClassInjector.DerivedConstructorBody(this);
 
-        //public GameObject tab;
         DataConfigPanel config;
         /// <summary>
         /// References a list of SmartDataContainerReferenceList, Each list turns into the options on a tab
@@ -27,37 +26,27 @@ namespace BmxStreetsUI.Components
         /// talks to the system to turn on and off etc, registers itself by looking for parent
         /// </summary>
         public MGMenu menu;
-        /// <summary>
-        /// The duplicate objects have open and close triggers mapped to the original objects
-        /// </summary>
-        public Action<BaseEventData> openMenuTrigger, CloseMenu;
-        public Action closeMenuTrigger;
-
         public string PanelName = "StreetsUIpanel";
-        public void Init()
-        {
-            listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
-        }
+        
         /// <summary>
         /// Run once data is populated
         /// </summary>
         public void RunSetup()
         {
             Log.Msg("StreetsUI Panel Setting up");
-
             var content = transform.FindDeepChild("Content");
             foreach (var trans in content.GetComponentsInChildren<Transform>(true))
             {
                 if (trans.name.ToLower().Contains("data panel"))
                 {
-                    //Destroy(trans.gameObject);
+                    //Destroy(trans.gameObject); // the existing data panels in the system tab we cloned
                 }
             }
 
             if (!GetReferences()) { Log.Msg("References failed"); return; }
             SetupConfigPanel(PanelName);
             SetupPanel();
-            //SetDataCallbacks();
+            SetupSelectors();
             var saveLoad = Singleton<SaveLoadManager>.GetInstance();
             if (saveLoad != null)
             {
@@ -68,9 +57,6 @@ namespace BmxStreetsUI.Components
         public void SetupTriggers(GameObject tab)
         {
             EventTrigger trigger = tab.GetComponent<EventTrigger>();
-            openMenuTrigger = delegate { OnOpen(); };
-            closeMenuTrigger = delegate { OnClose(); };
-            CloseMenu = delegate { OnClose(); };
             foreach (var trig in trigger.triggers)
             {
                 if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
@@ -80,7 +66,7 @@ namespace BmxStreetsUI.Components
                         trig.callback.m_PersistentCalls.RemoveListener(0);
                     }
                     trig.callback.RemoveAllListeners();
-                    trig.callback.AddListener(openMenuTrigger);
+                    trig.callback.AddListener(new System.Action<BaseEventData>(data => { OnOpen(); }));
                 }
             }
             foreach (var trig in trigger.delegates)
@@ -92,7 +78,7 @@ namespace BmxStreetsUI.Components
                         trig.callback.m_PersistentCalls.RemoveListener(0);
                     }
                     trig.callback.RemoveAllListeners();
-                    trig.callback.AddListener(openMenuTrigger);
+                    trig.callback.AddListener(new System.Action<BaseEventData>(data => { OnOpen(); }));
                 }
             }
 
@@ -108,7 +94,7 @@ namespace BmxStreetsUI.Components
             menu.OpenMenu();
             InputSystemEventCallback inputCancel = GetComponent<InputSystemEventCallback>();
             inputCancel.OnActionPerformed.RemoveAllListeners();
-            inputCancel.OnActionPerformed.AddListener(closeMenuTrigger);
+            inputCancel.OnActionPerformed.AddListener(new System.Action(() => { OnClose(); }));
 
         }
         void OnClose()
@@ -133,6 +119,7 @@ namespace BmxStreetsUI.Components
         void SetupPanel()
         {
             Log.Msg($"Setup {PanelName}");
+            gameObject.name = PanelName;
             foreach (var transform in transform)
             {
                 if (transform is Transform)
@@ -145,15 +132,23 @@ namespace BmxStreetsUI.Components
                 }
             }
 
-            gameObject.name = PanelName;
             if (menu == null) { Log.Msg($"No MGmenu"); return; }
             menu.Awake();
             menu.OnEnterOpen.RemoveAllListeners();
             if (menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
             menu.Init();
 
+        }
+        void SetupSelectors()
+        {
             UIHorizontalSelectorSmartSetBehaviour selector = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
             selector._DataReferenceSets = listSet;
+            selector._GeneralDataReferenceSets = null;
+            if (selector.GetComponent<HorizontalSelector>() != null)
+            {
+                selector.GetComponent<HorizontalSelector>().enableIndicators = listSet._DataRefLists.Count > 1;
+            }
+            selector.Init();
         }
         void SetupConfigPanel(string PanelLabel)
         {

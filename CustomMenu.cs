@@ -1,10 +1,4 @@
-﻿using Il2Cpp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace BmxStreetsUI
 {
     /// <summary>
@@ -15,7 +9,7 @@ namespace BmxStreetsUI
         /// <summary>
         /// The title that appears on the main menu
         /// </summary>
-        public string panelTitle;
+        public string TabTitle;
         /// <summary>
         /// Each group you place in here shows up as a tab of options inside your menu
         /// </summary>
@@ -23,7 +17,7 @@ namespace BmxStreetsUI
 
         public CustomMenu(string title, List<CustomMenuOptionGroup> groups) 
         { 
-            this.panelTitle = title;
+            this.TabTitle = title;
             this.Groups = groups;
         }
 

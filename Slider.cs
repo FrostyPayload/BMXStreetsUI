@@ -1,14 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BmxStreetsUI.Components;
+using Il2CppInterop.Runtime;
+using Il2CppSystem.Runtime.InteropServices;
 
 namespace BmxStreetsUI
 {
+    /// <summary>
+    /// Give a name, max and min value and callback. Calls back with value on change
+    /// </summary>
     public class Slider : CustomMenuOption
     {
+        Action<float> floatcallback;
         public float max, min, value;
+        public Slider(string title, float min, float max, string description = "") : base(title, description)
+        {
+            SetUIStyle(UIStyle.Slider);
+            this.min = min;
+            this.max = max;
+        }
         public override float GetMax()
         {
             return max;
@@ -16,6 +24,20 @@ namespace BmxStreetsUI
         public override float GetMin()
         {
             return min;
+        }
+        protected override void OnCallBackValue(Il2CppSystem.Object obj)
+        {
+            Log.Msg("Slider callback received");
+            if (obj.GetIl2CppType() == Il2CppType.Of<float>())
+            {
+                var type = Il2CppType.Of<float>();
+                float value = Marshal.PtrToStructure<float>(obj.Pointer);
+                floatcallback?.Invoke(value);
+            }
+        }
+        public void SetCallBack(Action<float> callback)
+        {
+            this.floatcallback = callback;
         }
     }
 }

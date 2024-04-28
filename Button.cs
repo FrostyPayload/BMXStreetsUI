@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using BmxStreetsUI.Components;
 
 namespace BmxStreetsUI
 {
     public class Button : CustomMenuOption
     {
-
+        public Button(string title, string description = "") : base(title, description)
+        {
+            SetUIStyle(UIStyle.Button);
+        }
+        public void SetCallBack(Action voidCallBack)
+        {
+            this.VoidCallBack = voidCallBack;
+        }
     }
 }
