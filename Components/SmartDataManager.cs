@@ -1,4 +1,5 @@
 ﻿using Il2Cpp;
+using Il2CppMG_Core.MG_SmartData.SaveLoad;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -79,7 +80,7 @@ namespace BmxStreetsUI.Components
             container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
             container.dataIdentifiers.categoryName = saveName;
             container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
-            //container.dataIdentifiers.categories.Add("StreetsUI");
+            container.dataIdentifiers.categories.Add(saveName);
             container._localizedLabel = name;
             container._localizedDescription = name;
             container.OnDataChangeableChanged = new UnityEvent();
@@ -91,6 +92,26 @@ namespace BmxStreetsUI.Components
             container._smartDatas = new Il2CppSystem.Collections.Generic.List<SmartData>();
 
             return container;
+        }
+
+        public static SmartDataContainerReferenceListSet CreateNewSet(string name)
+        {
+            var listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
+            listSet.SetName = name + "ListSet";
+            listSet.name = name + "Object";
+
+            return listSet;
+        }
+        public static SmartDataContainerReferenceList CreateNewList(string name)
+        {
+            var list = ScriptableObject.CreateInstance<SmartDataContainerReferenceList>();
+            list.ListName = name;
+            list.name = name + "ReferenceList";
+            list.OnSelected = new UnityEvent();
+            list.OnValueChanged = new UnityEvent();
+            list.OnDataChangeableChanged = new UnityEvent();
+            list.OnValueChanged_DataValue = new SmartDataEvent();
+            return list;
         }
     }
 }

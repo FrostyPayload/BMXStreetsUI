@@ -19,6 +19,7 @@ using Il2CppSystem.Reflection;
 using UnityEngine.Localization.SmartFormat.PersistentVariables;
 using UnityEngine.Localization;
 using Il2CppMG_Core.MG_SmartData.SaveLoad;
+using Il2CppInterop.Runtime;
 
 [assembly: MelonInfo(typeof(BmxStreetsUI.Components.StreetsUIMelon), "BMX Streets UI", "version", "Author Name")]
 [assembly: MelonGame()]
@@ -37,38 +38,23 @@ namespace BmxStreetsUI.Components
 
     public class StreetsUIMelon : MelonMod
     {
-        #region GUIConcept
-        bool on;
-        BMXFreeformPoseData[] poses;
-        BMXFreeformPoseData smith;
-        Vector3 smithRoot;
-        float rootX = 0f;
-        float rootY = 0f;
-        #endregion
-
-
-        UIPanel GrindTabTest;
-        GrindPosePanel GrindsPanel;
-
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("BMX Manager OnApplicationStart");
+            Log.Msg("BMX Manager OnApplicationStart");
         }
 
         public override void OnLateInitializeMelon() // Runs after OnApplicationStart.
         {
-            MelonLogger.Msg("OnApplicationLateStart");
+            Log.Msg("OnApplicationLateStart");
         }
 
         public override void OnSceneWasLoaded(int buildindex, string sceneName) // Runs when a Scene has Loaded and is passed the Scene's Build Index and Name.
         {
-
-
         }
 
         public override void OnSceneWasInitialized(int buildindex, string sceneName) // Runs when a Scene has Initialized and is passed the Scene's Build Index and Name.
         {
-            MelonLogger.Msg("OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
+            Log.Msg("OnSceneWasInitialized: " + buildindex.ToString() + " | " + sceneName);
         }
 
         public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
@@ -78,14 +64,6 @@ namespace BmxStreetsUI.Components
 
         public override void OnUpdate() // Runs once per frame.
         {
-            // the OnGUI concept
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                on = !on;
-                Cursor.lockState = on ? CursorLockMode.Confined : CursorLockMode.Locked;
-                Cursor.visible = on;
-            }
-
             // duplicates the system tab and system settings panel and manipulates to make a new menu
             // without losing all of the connections and events contained within ther objects
             if (Input.GetKeyDown(KeyCode.KeypadEnter))
@@ -98,51 +76,6 @@ namespace BmxStreetsUI.Components
             }
 
         }
-        void Setup()
-        {
-            GameObject systemSettingsPanel = GameObject.Find("System Tab Settings");
-            var systemSettingsTab = GameObject.Find("SYSTEM-TAB");
-            if (systemSettingsPanel == null) // does it need to be active for .Find()
-            {
-                foreach (var menu in UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                {
-                    if (menu.gameObject.name.ToLower().Contains("system tab settings"))
-                    {
-                        systemSettingsPanel = menu.gameObject;
-                        break;
-                    }
-                }
-            }
-
-            if (systemSettingsPanel != null && systemSettingsTab != null)
-            {
-                LoggerInstance.Msg($"Setting up new UI");
-                var duplicateTab = UnityEngine.Object.Instantiate(systemSettingsTab);
-                var duplicateSettingPanel = UnityEngine.Object.Instantiate(systemSettingsPanel);
-                if (duplicateTab == null)
-                {
-                    LoggerInstance.Msg("Tab is null");
-                    return;
-                }
-                if (duplicateSettingPanel == null)
-                {
-                    LoggerInstance.Msg("settings is null");
-                    return;
-                }
-                GrindsPanel = new GrindPosePanel();
-                GrindTabTest = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
-                GrindTabTest.tab = duplicateTab;
-                GrindTabTest.tabParent = systemSettingsTab.transform.parent.gameObject;
-                GrindTabTest.Init();
-                GrindsPanel.SetupData(GrindTabTest);
-                GrindTabTest.RunSetup();
-                // perhaps want to prefab the completed setup and keep it aside
-
-                LoggerInstance.Msg("Setup complete");
-            }
-
-        }
-
         void MockAPICall()
         {
             var groups = new List<CustomMenuOptionGroup>();
@@ -165,48 +98,10 @@ namespace BmxStreetsUI.Components
         }
         public void Callback(Il2CppSystem.Object obj)
         {
-            Log.Msg("Received callback");
+            // better to be providing specific callbacks to users, Action<float> etc if possible
+            Log.Msg($"Received callback, Type = {obj.GetIl2CppType().ToString()}");
         }
-        public override void OnFixedUpdate() // Can run multiple times per frame. Mostly used for Physics.
-        {
-            //MelonLogger.Msg("OnFixedUpdate");
-        }
-
-        public override void OnLateUpdate() // Runs once per frame after OnUpdate and OnFixedUpdate have finished.
-        {
-            //MelonLogger.Msg("OnLateUpdate");
-        }
-
-        public override void OnGUI() // Can run multiple times per frame. Mostly used for Unity's IMGUI.
-        {
-            // concept
-            if (!on) return;
-            if (poses == null | smith == null) return;
-
-            GUILayout.BeginVertical(new GUILayoutOption[2] { GUILayout.Height(600), GUILayout.Width(200) });
-
-            GUILayout.TextArea("Bars Rotation");
-            smith._barsRot = GUILayout.HorizontalSlider(smith._barsRot, -90, 90);
-            GUILayout.TextArea("Cranks Rotation");
-            smith._cranksRot = GUILayout.HorizontalSlider(smith._cranksRot, -90, 90);
-            GUILayout.TextArea("left pedal Rotation");
-            smith._leftPedalRot = GUILayout.HorizontalSlider(smith._leftPedalRot, -90, 90);
-            GUILayout.TextArea("right pedal Rotation");
-            smith._rightPedalRot = GUILayout.HorizontalSlider(smith._rightPedalRot, -90, 90);
-
-            GUILayout.TextArea("Postion X");
-            rootX = GUILayout.HorizontalSlider(rootX, -1, 1);
-
-            GUILayout.TextArea("Postion Z");
-            rootY = GUILayout.HorizontalSlider(rootY, -1, 1);
-            smith._rootPos = smithRoot + new Vector3(rootX, 0, rootY);
-
-            GUILayout.TextArea("Gravity");
-            Physics.gravity = new Vector3(0, GUILayout.HorizontalSlider(Physics.gravity.y, -1, -20), 0);
-
-            GUILayout.EndVertical();
-        }
-
+       
         public override void OnApplicationQuit() // Runs when the Game is told to Close.
         {
             MelonLogger.Msg("OnApplicationQuit");

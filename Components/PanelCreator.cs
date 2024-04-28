@@ -1,13 +1,15 @@
 ﻿using Il2Cpp;
 using Il2CppMG_UI.MenuSytem;
+using Il2CppTMPro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static BmxStreetsUI.Components.GrindPosePanel;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.Localization.Components;
 
 namespace BmxStreetsUI.Components
 {
@@ -44,35 +46,36 @@ namespace BmxStreetsUI.Components
                     Log.Msg("failed to find the system panel for duplication");
                     return false;
                 }
-                var NewTab = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
-                NewTab.tab = duplicateTab;
-                NewTab.tabParent = systemSettingsTab.transform.parent.gameObject;
-                SetupData(NewTab,newmenu);
-                NewTab.RunSetup();
+                duplicateTab.transform.SetParent(systemSettingsTab.transform.parent, false);
+                duplicateTab.GetComponent<LocalizeStringEvent>().enabled = false;
+                duplicateTab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.panelTitle;
+                duplicateTab.name = newmenu.panelTitle + "Object";
+
+                var smartui = duplicateTab.GetComponent<SmartUIBehaviour>();
+                smartui.UnRegisterEvents();
+
+                var UIPanel = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
+                UIPanel.transform.SetParent(systemSettingsPanel.transform.parent, false);
+                UIPanel.SetupTriggers(duplicateTab);
+                SetupData(UIPanel,newmenu);
+                UIPanel.RunSetup();
                 return true;
             }
             Log.Msg($"Failed to create {newmenu.panelTitle} UI");
             return false;
         }
+
         public virtual void SetupData(UIPanel panel, CustomMenu menu)
         {
             Log.Msg($"Setting up {menu.panelTitle} UI Data");
-            var listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
+            var listSet = SmartDataManager.CreateNewSet(menu.panelTitle);
             if (listSet == null) { Log.Msg($"ListSet is null in {menu.panelTitle} setup", true); return; }
-            panel.TabName = menu.panelTitle;
-
-            // populate list with every custommenugroup, setting up each options data and callabacks
+            
+            // populate list with every custommenugroup, setting up each options data and callbacks
             listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
             foreach (var tab in menu.Groups)
             {
-                var GroupOptions = ScriptableObject.CreateInstance<SmartDataContainerReferenceList>();
-                GroupOptions.ListName = tab.title;
-                GroupOptions.name = tab.title + "ReferenceList";
-                GroupOptions.OnSelected = new UnityEvent();
-                GroupOptions.OnValueChanged = new UnityEvent();
-                GroupOptions.OnDataChangeableChanged = new UnityEvent();
-                GroupOptions.OnValueChanged_DataValue = new SmartDataEvent();
-
+                var GroupOptions = SmartDataManager.CreateNewList(tab.title);
                 var container = SmartDataManager.GetNewContainer(tab.title);
 
                 foreach(var option in tab.options)
@@ -85,13 +88,11 @@ namespace BmxStreetsUI.Components
                 container.ValidateList();
                 listSet._DataRefLists.Add(GroupOptions);
             }
-
-            listSet.SetName = menu.panelTitle + "ReferenceListSet";
-            listSet.name = listSet.SetName + "Object";
+            panel.PanelName = menu.panelTitle;
             panel.listSet = listSet;
         }
         
-        void SetupOption(CustomMenuOption option, SmartDataContainer container)
+        public virtual void SetupOption(CustomMenuOption option, SmartDataContainer container)
         {
             var data = SmartDataManager.CreateSmartDatas(option);
             data._dataUIStyle = option.uiStyle;
