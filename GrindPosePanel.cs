@@ -1,12 +1,4 @@
 ﻿using Il2Cpp;
-using Il2CppInterop.Runtime.Injection;
-using MelonLoader;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -21,18 +13,12 @@ namespace BmxStreetsUI
         BMXFreeformPoseData[] poses;
         GameObject myBmx, ghost, bmx;
         Dictionary<GrindType, SmartDataContainerReferenceList> grindDataDict;
+
         void PopulateGrindPoses()
         {
-            var list = new List<BMXFreeformPoseData>();
-            foreach (var item in Resources.FindObjectsOfTypeAll<BMXFreeformPoseData>())
-            {
-                if (item.name.ToLower().Contains("grind"))
-                {
-                    list.Add(item);
-                }
-            }
-            poses = list.ToArray();
+            poses = Resources.FindObjectsOfTypeAll<BMXFreeformPoseData>().Where(x => x.name.ToLower().Contains("grind")).ToArray();
         }
+
         void SpawnCharacter()
         {
             var character = GameObject.Find("Player Components");

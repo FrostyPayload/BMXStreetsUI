@@ -3,12 +3,9 @@ using Il2CppMG_Core.MG_SmartData.SaveLoad;
 using Il2CppMG_UI.MenuSytem;
 using Il2CppTMPro;
 using MelonLoader;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Localization.SmartFormat;
-using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine.Localization.Components;
 

@@ -8,56 +8,77 @@
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+      <HintPath>dependencies\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <HintPath>dependencies\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>dependencies\Il2Cppmscorlib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MelonLoader">
-      <HintPath>..\..\Desktop\MelonLoader.x64\MelonLoader\net6\MelonLoader.dll</HintPath>
+      <HintPath>dependencies\MelonLoader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InputSystem">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
+      <HintPath>dependencies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InputSystem.ForUI">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Unity.InputSystem.ForUI.dll</HintPath>
+      <HintPath>dependencies\Unity.InputSystem.ForUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Localization">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Unity.Localization.dll</HintPath>
+      <HintPath>dependencies\Unity.Localization.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>dependencies\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.AIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.InputModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\BMX Streets\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>dependencies\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="move &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\BMX Streets\Mods&quot;" />
+  </Target>
 
 </Project>
