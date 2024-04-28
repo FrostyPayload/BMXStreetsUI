@@ -4,6 +4,28 @@
 
 TODO
 
+### Only tested Sliders
+setup and test button, steppedInt, toggle
+SteppedInts should be able to show text? - windowed = 1, fullscreen = 2
+
+### Entry Point
+find an entry as early as possible, account for mods that may call on us before were ready
+
+### Rogue Event 
+Track rogue event left on smartdata.OnValueChanged that calls to destroyed `SmartUIDataLabel`
+
+### Provide custom callbacks to endpoints
+currently all callbacks setup to receive an Il2CPPSystem.Object
+
+### SaveLoad
+Provide saveload system, either using in game system or separate
+
+### UIHorizontalSelector
+Currently manually handing the selector our refList, without it, the original SystemTab Settings show up as tab selections
+Not showing an issue but implies missing link
+
+
+
 ## Types
 
 ### SmartData:
