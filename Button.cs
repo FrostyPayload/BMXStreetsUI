@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace BmxStreetsUI
 {
-    [Serializable]
-    class GrindPoseData
+    public class Button : CustomMenuOption
     {
-        public float barsAngle, cranksAngle, leftPedalAngle, rightPedalAngle, bodyX, bodyZ;
+
     }
 }

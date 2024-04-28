@@ -1,9 +1,12 @@
-﻿using Il2Cpp;
+﻿using BmxStreetsUI.Components;
+using Il2Cpp;
+using Il2CppMG_UI.MenuSytem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace BmxStreetsUI
 {
@@ -12,63 +15,32 @@ namespace BmxStreetsUI
     /// </summary>
     public static class API
     {
-        public static CustomMenu AddCustomTabToMainMenu()
+        /// <summary>
+        /// Create a CustomMenu and use the other classes in this namespace to setup your menu, then bring it here to have it created and setup
+        /// </summary>
+        /// <param name="newMenu"></param>
+        /// <returns>Did the creation succeed. On fail, check unity logs for info</returns>
+        public static bool AddMenu(CustomMenu newMenu)
         {
-            return new CustomMenu();
+            var Creator = new PanelCreator();
+            return Creator.Create(newMenu);
         }
-        public static void RemoveMenu(CustomMenu menu)
+        /// <summary>
+        /// Retreive a menu using the name set in CustomMenu.panelTitle
+        /// </summary>
+        /// <param name="menuName"></param>
+        /// <returns>The menu if found, or null otherwise</returns>
+        public static CustomMenu? GetMenu(string menuName)
         {
-
+            return null;
         }
-
-    }
-
-    public class CustomMenu
-    {
-        /// <summary>
-        /// The title that appears on the main menu
-        /// </summary>
-        public string panelTitle;
-        /// <summary>
-        /// Each group shows up as a tab inside your menu
-        /// </summary>
-        public List<CustomMenuGroup> Groups;
-
-        public void UpdateOptions(List<CustomMenuGroup> options)
+        public static bool RemoveMenu(CustomMenu menu)
         {
-
+            return false;
         }
+
     }
 
-
-    /// <summary>
-    /// Represents a selection of options in the UI, such as Gameplay, Audio etc
-    /// </summary>
-    public class CustomMenuGroup
-    {
-        /// <summary>
-        /// The title on the menu when it opens
-        /// </summary>
-        public string title;
-        public List<CustomMenuOption> options;
-    }
-
-
-    /// <summary>
-    /// An option in a tab, such as a slider, button, incremented value
-    /// </summary>
-    public class CustomMenuOption
-    {
-        /// <summary>
-        /// Title seen on the left of the value your editing
-        /// </summary>
-        public string title;
-        /// <summary>
-        /// Description that pops up on the right as you edit a value
-        /// </summary>
-        public string description;
-        public bool DescriptionShouldShow;
-        public SmartData.DataUIStyle uiStyle;
-    }
+   
 
 }

@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine.Localization.Components;
 
-namespace BmxStreetsUI
+namespace BmxStreetsUI.Components
 {
     [RegisterTypeInIl2Cpp]
     public class UIPanel : MonoBehaviour
@@ -17,15 +17,8 @@ namespace BmxStreetsUI
         public UIPanel(IntPtr ptr) : base(ptr) { }
         public UIPanel() : base(ClassInjector.DerivedConstructorPointer<UIPanel>()) => ClassInjector.DerivedConstructorBody(this);
 
-        public GameObject characterPrefab, character, ghost, ghostPrefab, bmx, listroot, mainCanvas, tabParent;
-
-        public GameObject tab;
+        //public GameObject tab;
         DataConfigPanel config;
-        /// <summary>
-        /// An object that sticks around through duplication, contains prefabs of the slider,button etc.
-        /// Retreived through DataConfigPanel present on the panel object
-        /// </summary>
-        public SmartUIPaletteData pallete;
         /// <summary>
         /// References a list of SmartDataContainerReferenceList, Each list turns into the options on a tab
         /// </summary>
@@ -39,10 +32,8 @@ namespace BmxStreetsUI
         /// </summary>
         public Action<BaseEventData> openMenuTrigger, CloseMenu;
         public Action closeMenuTrigger;
-        Action<object> dataChangeCallbackData; // the callback we want updates through when using UI
 
-        public string TabName = "FrostyUITab";
-        public string PanelName = "FrostyUI panel";
+        public string PanelName = "StreetsUIpanel";
         public void Init()
         {
             listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
@@ -52,36 +43,29 @@ namespace BmxStreetsUI
         /// </summary>
         public void RunSetup()
         {
-            Debug.Log("StreetsUI Panel Setting up");
+            Log.Msg("StreetsUI Panel Setting up");
 
             var content = transform.FindDeepChild("Content");
             foreach (var trans in content.GetComponentsInChildren<Transform>(true))
             {
                 if (trans.name.ToLower().Contains("data panel"))
                 {
-                    Destroy(trans.gameObject);
+                    //Destroy(trans.gameObject);
                 }
             }
 
-            if (tab == null)
-            {
-                Debug.Log("Tab is null in UIPanel Setup");
-                return;
-            }
-            if (!GetReferences()) { Debug.Log("References failed"); return; }
-            SetupTriggers();
-            if (!SetupTab(TabName)) { return; }
+            if (!GetReferences()) { Log.Msg("References failed"); return; }
             SetupConfigPanel(PanelName);
             SetupPanel();
-            SetDataCallbacks();
+            //SetDataCallbacks();
             var saveLoad = Singleton<SaveLoadManager>.GetInstance();
             if (saveLoad != null)
             {
-                Debug.Log($"Save load system found, adding data");
+                Log.Msg($"Save load system found, adding data");
                 saveLoad.dataList.Add(listSet);
             }
         }
-        void SetupTriggers()
+        public void SetupTriggers(GameObject tab)
         {
             EventTrigger trigger = tab.GetComponent<EventTrigger>();
             openMenuTrigger = delegate { OnOpen(); };
@@ -113,13 +97,12 @@ namespace BmxStreetsUI
             }
 
         }
-
         void OnOpen()
         {
-            Debug.Log("FrostyUI panel opening");
+            Log.Msg($"{PanelName} panel opening");
             if (menu.GetMenuSystem() == null)
             {
-                Debug.LogError($"No menu System found in frostyUI OnOpen, GameObject {gameObject.name}");
+                Log.Msg($"No menu System found in frostyUI OnOpen, GameObject {PanelName}", true);
                 return;
             }
             menu.OpenMenu();
@@ -130,10 +113,10 @@ namespace BmxStreetsUI
         }
         void OnClose()
         {
-            Debug.Log("FrostyUI Panel closing");
+            Log.Msg($"{PanelName} panel closing");
             if (menu.linkedPreviousMenu == null)
             {
-                Debug.Log($"Last menu is null");
+                Log.Msg($"Last menu is null");
             }
             menu.OpenLastMenu();
             InputSystemEventCallback inputCancel = GetComponent<InputSystemEventCallback>();
@@ -143,21 +126,13 @@ namespace BmxStreetsUI
         }
         bool GetReferences()
         {
-            mainCanvas = GameObject.Find("Main Menu Canvas");
             config = GetComponent<DataConfigPanel>();
             menu = GetComponent<MGMenu>();
-            if (mainCanvas == null) { Debug.Log($"Main canvas is not found"); return false; }
-            if (tab == null) { Debug.Log($"Tab is not found in getReferences"); return false; }
-            var smartui = tab.GetComponent<SmartUIBehaviour>();
-            var manager = smartui._smartUIManagerData;
-            pallete = manager._paletteData;
-            listroot = config.listRoot.gameObject;
-            smartui.UnRegisterEvents();
             return true;
         }
         void SetupPanel()
         {
-            Debug.Log($"Setup frostyUIPanel {PanelName}");
+            Log.Msg($"Setup {PanelName}");
             foreach (var transform in transform)
             {
                 if (transform is Transform)
@@ -171,23 +146,21 @@ namespace BmxStreetsUI
             }
 
             gameObject.name = PanelName;
-            transform.SetParent(mainCanvas.transform, false);
-            if (menu == null) { Debug.Log($"No MGmenu"); return; }
+            if (menu == null) { Log.Msg($"No MGmenu"); return; }
             menu.Awake();
             menu.OnEnterOpen.RemoveAllListeners();
-            if(menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
+            if (menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
             menu.Init();
 
-            //UIHorizontalSelectorSmartSetBehaviour selector = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
-            //selector._DataReferenceSets = listSet;
+            UIHorizontalSelectorSmartSetBehaviour selector = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
+            selector._DataReferenceSets = listSet;
         }
-        
         void SetupConfigPanel(string PanelLabel)
         {
             if (config != null)
             {
-                Debug.Log("Setting up config panel");
-                config.panelLabel.text = TabName;
+                Log.Msg("Setting up config panel");
+                config.panelLabel.text = PanelLabel;
                 config.configDatas = listSet;
                 config.configDatas_DevAlt = null;
                 config._hasDevAltData = false;
@@ -203,46 +176,7 @@ namespace BmxStreetsUI
                 config.Validate();
             }
         }
-        bool SetupTab(string tabName)
-        {
-            if (tab == null) { Debug.Log("System tab not found"); return false; }
-            // configure clones settings tab
-            tab.name = "FrostyUIPanel";
-            tab.GetComponent<LocalizeStringEvent>().enabled = false;
-            tab.GetComponentInChildren<TextMeshProUGUI>().text = tabName;
-            tab.transform.SetParent(tabParent.transform, false);
-            return true;
-        }
-        void SetDataCallbacks()
-        {
-            if (!listSet) { Debug.Log($"StreetsUI: No Listset in smartData Callback : {gameObject.name}"); return; }
-            dataChangeCallbackData = delegate (object obj) { Callback(obj); };
-            foreach (var refList in listSet._DataRefLists)
-            {
-                foreach(var data in refList._dataContainer._smartDatas)
-                {
-                    if (data.OnValueChanged_DataValue != null)
-                    {
-                        // can we remove all?
-                        data.OnValueChanged_DataValue.AddListener(dataChangeCallbackData);
-                    }
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// Should be receiving on this when smartdata is changed, rogue event with null reference in the way?
-        /// </summary>
-        /// <param name="value"></param>
-        protected virtual void Callback(object value)
-        {
-            if (value == null) { Debug.Log("Received null in callback"); return; }
-            Debug.Log($"Receiving callback : object = {value.GetType().ToString()}");
-            if (value is SmartData<SmartDataFloatStuct>) Debug.Log("Val is smart<floatstruct>");
-            if (value is SmartData) Debug.Log("Val is smartData");
-        }
-
+       
     }
 
 }
