@@ -20,10 +20,10 @@ using UnityEngine.Localization.SmartFormat.PersistentVariables;
 using UnityEngine.Localization;
 using Il2CppMG_Core.MG_SmartData.SaveLoad;
 
-[assembly: MelonInfo(typeof(BmxStreetsUI.UIManager), "BMX Streets UI", "version", "Author Name")]
+[assembly: MelonInfo(typeof(BmxStreetsUI.Components.StreetsUIMelon), "BMX Streets UI", "version", "Author Name")]
 [assembly: MelonGame()]
 
-namespace BmxStreetsUI
+namespace BmxStreetsUI.Components
 {
     public static class BuildInfo
     {
@@ -35,7 +35,7 @@ namespace BmxStreetsUI
         public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
     }
 
-    public class UIManager : MelonMod
+    public class StreetsUIMelon : MelonMod
     {
         #region GUIConcept
         bool on;
@@ -100,16 +100,16 @@ namespace BmxStreetsUI
         {
             GameObject systemSettingsPanel = GameObject.Find("System Tab Settings");
             var systemSettingsTab = GameObject.Find("SYSTEM-TAB");
-            if(systemSettingsPanel == null) // does it need to be active for .Find()
+            if (systemSettingsPanel == null) // does it need to be active for .Find()
             {
-                 foreach (var menu in UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                 {
+                foreach (var menu in UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
                     if (menu.gameObject.name.ToLower().Contains("system tab settings"))
                     {
                         systemSettingsPanel = menu.gameObject;
                         break;
                     }
-                 }
+                }
             }
 
             if (systemSettingsPanel != null && systemSettingsTab != null)

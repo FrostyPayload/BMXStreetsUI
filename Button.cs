@@ -6,16 +6,8 @@ using System.Threading.Tasks;
 
 namespace BmxStreetsUI
 {
-    class ModMapManager
+    public class Button : CustomMenuOption
     {
-        public void OnSceneDidLoad()
-        {
-
-        }
-        public void OnMapMenuOpened()
-        {
-
-        }
 
     }
 }

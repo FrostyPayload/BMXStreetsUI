@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace BmxStreetsUI
 {
-    internal class Manuals
+    public class Toggle : CustomMenuOption
     {
+
     }
 }

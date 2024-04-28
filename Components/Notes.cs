@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BmxStreetsUI
+namespace BmxStreetsUI.Components
 {
     /*
     BMX Showcase Body - bike in ui menu

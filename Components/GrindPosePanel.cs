@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace BmxStreetsUI
+namespace BmxStreetsUI.Components
 {
+    // to be moved to seperate mod
     public class GrindPosePanel
     {
-       
         BMXFreeformPoseData[] poses;
         GameObject myBmx, ghost, bmx;
         Dictionary<GrindType, SmartDataContainerReferenceList> grindDataDict;
@@ -34,7 +34,7 @@ namespace BmxStreetsUI
         {
             var character = GameObject.Find("Player Components");
             if (character == null || bmx == null) { Debug.Log("No character or bike found in FrostyUI.spawncharacter"); return; }
-           // if (ghost == null) ghost = Instantiate(character);
+            // if (ghost == null) ghost = Instantiate(character);
             ghost.name = "FrostyGrindMenuGhostCharacter";
 
             var toDestroy = new List<GameObject>();
@@ -70,15 +70,16 @@ namespace BmxStreetsUI
             var body = GameObject.Find("BMX Showcase Body");
             if (body != null)
             {
-                Debug.Log("Found bmx in open grinds tab");
+                Log.Msg("Found bmx in open grinds tab");
                 body.transform.Rotate(0, 90, 0);
                 myBmx = body;
             }
         }
         public void SetupData(UIPanel panel)
         {
+            Log.Msg("Setting up grinds pose panel");
             var listSet = panel.listSet;
-            if(listSet == null) { Debug.LogError($"Listset is null in GrindposePanel setup"); return; }
+            if (listSet == null) { Log.Msg($"Listset is null in GrindposePanel setup", true); return; }
             grindDataDict = new Dictionary<GrindType, SmartDataContainerReferenceList>();
             foreach (var grindType in typeof(GrindType).GetEnumValues())
             {
@@ -103,7 +104,7 @@ namespace BmxStreetsUI
                     container.searchType = "";
                     container.SetDefaultValue();
 
-                   // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
+                    // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
                     container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
                     container.dataIdentifiers.categoryName = grindName + " Grind Pose";
                     container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
@@ -140,6 +141,7 @@ namespace BmxStreetsUI
         }
         void CreateDatas(SmartDataContainer container, GrindType grindType, string grindName)
         {
+            Log.Msg("Creating grind pose data");
             var BarsAngleSmartData = ScriptableObject.CreateInstance<SmartData_Float>();
             BarsAngleSmartData.OnDataChangeableChanged = new UnityEvent();
             BarsAngleSmartData.DataChangeableCallback = new BoolCallBackEvent();
