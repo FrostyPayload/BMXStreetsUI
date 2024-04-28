@@ -23,8 +23,9 @@ namespace BmxStreetsUI
         public bool DescriptionShouldShow;
         public SmartData.DataUIStyle uiStyle;
 
-        Action<object> callback;
-        public bool SetCallBack(Action<object> callback)
+        public Action voidCallBack;
+        public Action<Il2CppSystem.Object> callback;
+        public bool SetCallBack(Action<Il2CppSystem.Object> callback)
         {
             this.callback = callback;
             return false;

@@ -13,7 +13,7 @@ namespace BmxStreetsUI.Components
     {
         public static void Msg(string msg, bool error = false)
         {
-            if (error) { UnityEngine.Debug.LogError("StreetsUIERROR: " + msg); } else UnityEngine.Debug.Log("StreetsUI Log" + msg);
+            if (error) { UnityEngine.Debug.LogError("StreetsUIERROR: " + msg); } else UnityEngine.Debug.Log("StreetsUI Log: " + msg);
         }
     }
 }

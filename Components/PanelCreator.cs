@@ -47,7 +47,6 @@ namespace BmxStreetsUI.Components
                 var NewTab = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
                 NewTab.tab = duplicateTab;
                 NewTab.tabParent = systemSettingsTab.transform.parent.gameObject;
-                NewTab.Init();
                 SetupData(NewTab,newmenu);
                 NewTab.RunSetup();
                 return true;
@@ -58,9 +57,12 @@ namespace BmxStreetsUI.Components
         public virtual void SetupData(UIPanel panel, CustomMenu menu)
         {
             Log.Msg($"Setting up {menu.panelTitle} UI Data");
-            var listSet = panel.listSet;
+            var listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
             if (listSet == null) { Log.Msg($"ListSet is null in {menu.panelTitle} setup", true); return; }
             panel.TabName = menu.panelTitle;
+
+            // populate list with every custommenugroup, setting up each options data and callabacks
+            listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
             foreach (var tab in menu.Groups)
             {
                 var GroupOptions = ScriptableObject.CreateInstance<SmartDataContainerReferenceList>();
@@ -71,53 +73,36 @@ namespace BmxStreetsUI.Components
                 GroupOptions.OnDataChangeableChanged = new UnityEvent();
                 GroupOptions.OnValueChanged_DataValue = new SmartDataEvent();
 
-                var container = ScriptableObject.CreateInstance<SmartDataContainer>();
-                var name = new UnityEngine.Localization.LocalizedString();
-                container._ContainerName = tab.title + "SmartContainer";
-                container.name = container._ContainerName + "Object";
-                container._useStandardGameDataPanel = false;
-                container._description = "";
-                container.searchType = "";
-                container.SetDefaultValue();
-
-                // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
-                container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
-                container.dataIdentifiers.categoryName = tab.title;
-                container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
-                //container.dataIdentifiers.categories.Add("StreetsUI");
-                container._localizedLabel = name;
-                container._localizedDescription = name;
-                container.OnDataChangeableChanged = new UnityEvent();
-                container.filterSearchByName = false;
-                container.assetSearchFolder = "";
-                container.dataSaveExtension = "streetsui";
-                container.OnAnyValueChanged = new UnityEvent();
-                container._customSearchTag = "";
-                container._smartDatas = new Il2CppSystem.Collections.Generic.List<SmartData>();
+                var container = SmartDataManager.GetNewContainer(tab.title);
 
                 foreach(var option in tab.options)
                 {
-                    SetupOption(option);
+                    SetupOption(option, container);
                 }
                 GroupOptions.connectedContainer = container;
                 GroupOptions._dataContainer = container;
                 GroupOptions.dataGroup = container._smartDatas;
                 container.ValidateList();
+                listSet._DataRefLists.Add(GroupOptions);
             }
 
             listSet.SetName = menu.panelTitle + "ReferenceListSet";
             listSet.name = listSet.SetName + "Object";
-            listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
-           
+            panel.listSet = listSet;
         }
         
-        void SetupOption(CustomMenuOption option)
+        void SetupOption(CustomMenuOption option, SmartDataContainer container)
         {
             var data = SmartDataManager.CreateSmartDatas(option);
             data._dataUIStyle = option.uiStyle;
             data.OnDataChangeableChanged = new UnityEvent();
             data.DataChangeableCallback = new BoolCallBackEvent();
+            data.OnValueChanged_DataValue = new SmartDataEvent();
+            data.OnValueChanged_DataValue.AddListener(option.callback);
+            data.OnValueChanged = new UnityEvent();
+           // data.OnValueChanged.AddListener(option.voidCallBack);
             data.EnableDataChangeable();
+            container._smartDatas.Add(data);
         }
     }
 }

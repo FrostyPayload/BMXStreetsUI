@@ -159,7 +159,7 @@ namespace BmxStreetsUI.Components
             barsAngleSmartType._label = "Bars angle";
             barsAngleSmartType._identifyer = grindName + "PoseBarsAngle";
             BarsAngleSmartData._description = $"The angle you hold your bars at while in a {grindName} pose";
-
+            
             BarsAngleSmartData.SetData(barsAngleSmartType);
             container._smartDatas.Add(BarsAngleSmartData);
 

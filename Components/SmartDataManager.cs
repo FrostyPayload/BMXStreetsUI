@@ -1,10 +1,13 @@
 ﻿using Il2Cpp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace BmxStreetsUI.Components
 {
@@ -62,5 +65,32 @@ namespace BmxStreetsUI.Components
             return data;
         }
 
+        public static SmartDataContainer GetNewContainer(string saveName, string folder = "")
+        {
+            var container = ScriptableObject.CreateInstance<SmartDataContainer>();
+            var name = new UnityEngine.Localization.LocalizedString();
+            container._ContainerName = saveName + "SmartContainer";
+            container.name = container._ContainerName + "Object";
+            container._useStandardGameDataPanel = false;
+            container._description = "";
+            container.searchType = "";
+            container.SetDefaultValue();
+            // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
+            container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
+            container.dataIdentifiers.categoryName = saveName;
+            container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
+            //container.dataIdentifiers.categories.Add("StreetsUI");
+            container._localizedLabel = name;
+            container._localizedDescription = name;
+            container.OnDataChangeableChanged = new UnityEvent();
+            container.filterSearchByName = false;
+            container.assetSearchFolder = "";
+            container.dataSaveExtension = "streetsui";
+            container.OnAnyValueChanged = new UnityEvent();
+            container._customSearchTag = "";
+            container._smartDatas = new Il2CppSystem.Collections.Generic.List<SmartData>();
+
+            return container;
+        }
     }
 }

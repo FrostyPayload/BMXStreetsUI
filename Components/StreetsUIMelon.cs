@@ -92,7 +92,9 @@ namespace BmxStreetsUI.Components
             {
                 // need to hook in when menu is open to find the objects i want to duplicate,
                 // locate an object we can rely on in an onsceneload instead, "PauseMenu"?
-                Setup();
+                // Setup();
+
+                MockAPICall();
             }
 
         }
@@ -141,6 +143,30 @@ namespace BmxStreetsUI.Components
 
         }
 
+        void MockAPICall()
+        {
+            var groups = new List<CustomMenuOptionGroup>();
+
+            var mygroup = new CustomMenuOptionGroup("My menu");
+
+            var myoption = new Slider();
+            myoption.title = "MyValue";
+            myoption.max = 50;
+            myoption.min = 0;
+            myoption.SetCallBack(Callback);
+
+            mygroup.title = "custom menu";
+            mygroup.options.Add(myoption);
+
+            groups.Add(mygroup);
+
+            var mymenu = new CustomMenu("MyTab", groups);
+            API.AddMenu(mymenu);
+        }
+        public void Callback(Il2CppSystem.Object obj)
+        {
+            Log.Msg("Received callback");
+        }
         public override void OnFixedUpdate() // Can run multiple times per frame. Mostly used for Physics.
         {
             //MelonLogger.Msg("OnFixedUpdate");

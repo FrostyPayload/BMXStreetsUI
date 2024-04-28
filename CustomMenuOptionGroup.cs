@@ -19,5 +19,11 @@ namespace BmxStreetsUI
         /// An entry in a tab, like a slider or button
         /// </summary>
         public List<CustomMenuOption> options;
+
+        public CustomMenuOptionGroup(string title)
+        {
+            this.title = title;
+            options = new List<CustomMenuOption>();
+        }
     }
 }

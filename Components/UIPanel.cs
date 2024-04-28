@@ -20,7 +20,7 @@ namespace BmxStreetsUI.Components
         public UIPanel(IntPtr ptr) : base(ptr) { }
         public UIPanel() : base(ClassInjector.DerivedConstructorPointer<UIPanel>()) => ClassInjector.DerivedConstructorBody(this);
 
-        public GameObject characterPrefab, character, ghost, ghostPrefab, bmx, listroot, mainCanvas, tabParent;
+        public GameObject listroot, mainCanvas, tabParent;
 
         public GameObject tab;
         DataConfigPanel config;
@@ -42,7 +42,7 @@ namespace BmxStreetsUI.Components
         /// </summary>
         public Action<BaseEventData> openMenuTrigger, CloseMenu;
         public Action closeMenuTrigger;
-        Action<object> dataChangeCallbackData; // the callback we want updates through when using UI
+        Action<Il2CppSystem.Object> dataChangeCallbackData; // the callback we want updates through when using UI
 
         public string TabName = "FrostyUITab";
         public string PanelName = "FrostyUI panel";
@@ -218,7 +218,7 @@ namespace BmxStreetsUI.Components
         void SetDataCallbacks()
         {
             if (!listSet) { Log.Msg($"StreetsUI: No Listset in smartData Callback : {gameObject.name}"); return; }
-            dataChangeCallbackData = delegate (object obj) { Callback(obj); };
+            dataChangeCallbackData = delegate (Il2CppSystem.Object obj) { Callback(obj); };
             foreach (var refList in listSet._DataRefLists)
             {
                 foreach (var data in refList._dataContainer._smartDatas)
@@ -237,7 +237,7 @@ namespace BmxStreetsUI.Components
         /// Should be receiving on this when smartdata is changed, rogue event with null reference in the way?
         /// </summary>
         /// <param name="value"></param>
-        protected virtual void Callback(object value)
+        protected virtual void Callback(Il2CppSystem.Object value)
         {
             if (value == null) { Log.Msg("Received null in callback"); return; }
             Log.Msg($"Receiving callback : object = {value.GetType().ToString()}");
