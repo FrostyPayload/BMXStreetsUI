@@ -10,6 +10,5 @@ namespace BmxStreetsUI
     class GrindPoseData
     {
         public float barsAngle, cranksAngle, leftPedalAngle, rightPedalAngle, bodyX, bodyZ;
-
     }
 }

@@ -1,24 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MelonLoader;
+﻿using MelonLoader;
 using Il2Cpp;
 using UnityEngine;
-using UnityEngine.Events;
-using Il2CppMG_Gameplay.UI;
 using Il2CppMG_UI.MenuSytem;
-using Il2CppMG_UI;
-using Il2CppMichsky.UI.ModernUIPack;
-using Il2CppTMPro;
-using UnityEngine.EventSystems;
-using System.Reflection;
-using Il2CppMG_PlaybackSystem;
-using Il2CppSystem.Reflection;
-using UnityEngine.Localization.SmartFormat.PersistentVariables;
-using UnityEngine.Localization;
-using Il2CppMG_Core.MG_SmartData.SaveLoad;
+
 
 [assembly: MelonInfo(typeof(BmxStreetsUI.UIManager), "BMX Streets UI", "version", "Author Name")]
 [assembly: MelonGame()]
@@ -100,18 +84,14 @@ namespace BmxStreetsUI
         }
         void Setup()
         {
-            GameObject systemSettingsPanel = GameObject.Find("System Tab Settings");
+            GameObject systemSettingsPanel = GameObject.Find(Constants.SystemTabSettings);
             var systemSettingsTab = GameObject.Find("SYSTEM-TAB");
             if(systemSettingsPanel == null) // does it need to be active for .Find()
             {
-                 foreach (var menu in UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                 {
-                    if (menu.gameObject.name.ToLower().Contains("system tab settings"))
-                    {
-                        systemSettingsPanel = menu.gameObject;
-                        break;
-                    }
-                 }
+                systemSettingsPanel = UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                                                        .Where(menu => menu.gameObject.name.ToLower()
+                                                                                           .Contains(Constants.SystemTabSettings))
+                                                        .FirstOrDefault().gameObject;
             }
 
             if (systemSettingsPanel != null && systemSettingsTab != null)
