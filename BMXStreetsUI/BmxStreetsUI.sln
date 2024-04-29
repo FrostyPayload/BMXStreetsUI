@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BmxStreetsUI", "BmxStreetsUI.csproj", "{F6FCB4EC-6673-4202-816A-A67D29101D0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmxStreetsUI", "BmxStreetsUI.csproj", "{F6FCB4EC-6673-4202-816A-A67D29101D0C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BMXStreetsUIExampleMod", "..\BMXStreetsUIExampleMod\BMXStreetsUIExampleMod.csproj", "{E29CE99B-7CFF-40B4-8B4A-E789B6E141A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F6FCB4EC-6673-4202-816A-A67D29101D0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6FCB4EC-6673-4202-816A-A67D29101D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6FCB4EC-6673-4202-816A-A67D29101D0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E29CE99B-7CFF-40B4-8B4A-E789B6E141A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E29CE99B-7CFF-40B4-8B4A-E789B6E141A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E29CE99B-7CFF-40B4-8B4A-E789B6E141A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E29CE99B-7CFF-40B4-8B4A-E789B6E141A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

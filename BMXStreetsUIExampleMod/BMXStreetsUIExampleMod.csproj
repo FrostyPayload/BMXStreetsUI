@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\BMXStreetsUI\dependencies\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BmxStreetsUI">
+      <HintPath>BmxStreetsUI.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>..\BMXStreetsUI\dependencies\Il2CppInterop.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>..\BMXStreetsUI\dependencies\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="MelonLoader">
+      <HintPath>..\BMXStreetsUI\dependencies\MelonLoader.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
