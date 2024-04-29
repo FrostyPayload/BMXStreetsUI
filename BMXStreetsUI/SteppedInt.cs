@@ -1,5 +1,6 @@
 ﻿using BmxStreetsUI.Components;
 using Il2CppInterop.Runtime;
+using Il2CppSystem.Runtime.InteropServices;
 
 namespace BmxStreetsUI
 {
@@ -17,10 +18,12 @@ namespace BmxStreetsUI
         }
         protected override void OnCallBackValue(Il2CppSystem.Object obj)
         {
-            Log.Msg($"SteppedInt callback received with type {obj.GetIl2CppType().ToString()}");
+            base.OnCallBackValue(obj);
+            Log.Msg($"SteppedInt callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
-                float value = BitConverter.ToSingle(BitConverter.GetBytes(obj.Pointer.ToInt64()));
+                var val = obj.Pointer;
+                float value = float.Parse(obj.ToString());
                 IntCallback?.Invoke((int)value);
             }
         }

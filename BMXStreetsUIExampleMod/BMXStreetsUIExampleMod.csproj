@@ -22,6 +22,12 @@
     <Reference Include="MelonLoader">
       <HintPath>..\BMXStreetsUI\dependencies\MelonLoader.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

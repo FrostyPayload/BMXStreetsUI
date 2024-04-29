@@ -7,6 +7,11 @@ namespace BmxStreetsUI
     /// </summary>
     public static class API
     {
+        internal static bool Initialize()
+        {
+            Log.Msg($"API Initialize");
+            return true;
+        }
         /// <summary>
         /// Create a CustomMenu and use the other classes in this namespace to setup your menu, then bring it here to have it created and setup
         /// </summary>

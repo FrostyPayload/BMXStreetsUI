@@ -17,11 +17,20 @@ namespace BmxStreetsUI
         /// Sliders, Toggles, Buttons and SteppedInt's all go in here
         /// </summary>
         public List<CustomMenuOption> options;
-
+        internal Action SelectCallBack { get; private set; }
+        internal Action DeSelectCallBack { get; private set; }
         public CustomMenuOptionGroup(string GroupTitle)
         {
             this.title = GroupTitle;
             options = new List<CustomMenuOption>();
+        }
+        public void SetOnSelected(Action OnTabSelected)
+        {
+            this.SelectCallBack = OnTabSelected;
+        }
+        public void SetOnDeSelected(Action OnTabDeSelected)
+        {
+            this.DeSelectCallBack = OnTabDeSelected;
         }
     }
 }

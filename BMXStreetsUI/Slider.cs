@@ -27,12 +27,13 @@ namespace BmxStreetsUI
         }
         protected override void OnCallBackValue(Il2CppSystem.Object obj)
         {
+            base.OnCallBackValue(obj);
             Log.Msg("Slider callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
-                var type = Il2CppType.Of<float>();
-                float value = Marshal.PtrToStructure<float>(obj.Pointer);
-                floatcallback?.Invoke(value);
+                //float value = obj;
+                //floatcallback?.Invoke(obj);
+                
             }
         }
         public void SetCallBack(Action<float> callback)

@@ -1,6 +1,7 @@
 ﻿using MelonLoader;
 using Il2Cpp;
 using BmxStreetsUI;
+using UnityEngine;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon), "BMX Streets UI Example mod", "version", "Author Name")]
 [assembly: MelonGame()]
@@ -9,7 +10,7 @@ namespace BMXStreetsUIExampleMod
     public static class BuildInfo
     {
         public const string Name = "BMXStreetsUIExampleMod"; // Name of the Mod.  (MUST BE SET)
-        public const string Description = "Mod for testing and understanding"; // Description for the Mod.  (Set as null if none)
+        public const string Description = "Mod for testing and understanding the BMXStreetsUI API"; // Description for the Mod.  (Set as null if none)
         public const string Author = "FrostyP/LineRyder"; // Author of the Mod.  (MUST BE SET)
         public const string Company = null; // Company that made the Mod.  (Set as null if none)
         public const string Version = "1.0.0"; // Version of the Mod.  (MUST BE SET)
@@ -19,7 +20,14 @@ namespace BMXStreetsUIExampleMod
     {
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            SetupMyUI();
+            
+        }
+        public override void OnUpdate()
+        {
+            if (Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                SetupMyUI();
+            }
         }
         void SetupMyUI()
         {

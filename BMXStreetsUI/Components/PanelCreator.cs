@@ -9,6 +9,7 @@ namespace BmxStreetsUI.Components
 {
     public class PanelCreator
     {
+        GameObject? tab, Panel;
         public virtual bool Create(CustomMenu newmenu)
         {
             GameObject systemSettingsPanel = GameObject.Find(Constants.SystemTabSettings);
@@ -23,39 +24,47 @@ namespace BmxStreetsUI.Components
 
             if (systemSettingsPanel != null && systemSettingsTab != null)
             {
-                Log.Msg($"Setting up new UI");
-                var duplicateTab = UnityEngine.Object.Instantiate(systemSettingsTab);
-                var duplicateSettingPanel = UnityEngine.Object.Instantiate(systemSettingsPanel);
-                if (duplicateTab == null)
+                Log.Msg($"Setting up new StreetsUI");
+                 tab = UnityEngine.Object.Instantiate(systemSettingsTab);
+                 Panel = UnityEngine.Object.Instantiate(systemSettingsPanel);
+                if (tab == null)
                 {
                     Log.Msg("Failed to find the system tab for duplication");
+                    OnFail();
                     return false;
                 }
-                if (duplicateSettingPanel == null)
+                if (Panel == null)
                 {
                     Log.Msg("failed to find the system panel for duplication");
+                    OnFail();
                     return false;
                 }
-                duplicateTab.transform.SetParent(systemSettingsTab.transform.parent, false);
-                duplicateTab.GetComponent<LocalizeStringEvent>().enabled = false;
-                duplicateTab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.TabTitle;
-                duplicateTab.name = newmenu.TabTitle + "Object";
+                tab.transform.SetParent(systemSettingsTab.transform.parent, false);
+                tab.GetComponent<LocalizeStringEvent>().enabled = false;
+                tab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.TabTitle;
+                tab.name = newmenu.TabTitle + "Object";
 
-                var smartui = duplicateTab.GetComponent<SmartUIBehaviour>();
+                var smartui = tab.GetComponent<SmartUIBehaviour>();
                 smartui.UnRegisterEvents();
 
-                var UIPanel = duplicateSettingPanel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
+                var UIPanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
                 UIPanel.transform.SetParent(systemSettingsPanel.transform.parent, false);
-                UIPanel.SetupTriggers(duplicateTab);
+                UIPanel.SetupTriggers(tab);
                 SetupData(UIPanel,newmenu);
                 UIPanel.RunSetup();
                 return true;
             }
             Log.Msg($"Failed to create {newmenu.TabTitle} UI");
+            OnFail();
             return false;
         }
-
-        public virtual void SetupData(UIPanel panel, CustomMenu menu)
+        void OnFail(string menuname)
+        {
+            Log.Msg($"Failed to Create {menuname}");
+            if(tab != null) UnityEngine.GameObject.Destroy(tab);
+            if (Panel != null) UnityEngine.GameObject.Destroy(Panel);
+        }
+        protected virtual void SetupData(UIPanel panel, CustomMenu menu)
         {
             Log.Msg($"Setting up {menu.TabTitle} UI Data");
             var listSet = SmartDataManager.CreateNewSet(menu.TabTitle);
@@ -66,7 +75,7 @@ namespace BmxStreetsUI.Components
             foreach (var tab in menu.Groups)
             {
                 var GroupOptions = SmartDataManager.CreateNewList(tab.title);
-                var container = SmartDataManager.GetNewContainer(tab.title);
+                var container = SmartDataManager.GetNewContainer(tab.title,menu.TabTitle);
 
                 foreach(var option in tab.options)
                 {
@@ -82,7 +91,7 @@ namespace BmxStreetsUI.Components
             panel.listSet = listSet;
         }
         
-        public virtual void SetupOption(CustomMenuOption option, SmartDataContainer container)
+        protected virtual void SetupOption(CustomMenuOption option, SmartDataContainer container)
         {
             var data = SmartDataManager.CreateSmartData(option);
             data.OnDataChangeableChanged = new UnityEvent();

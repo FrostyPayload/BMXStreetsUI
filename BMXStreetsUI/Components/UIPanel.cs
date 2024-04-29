@@ -142,13 +142,19 @@ namespace BmxStreetsUI.Components
         void SetupSelectors()
         {
             UIHorizontalSelectorSmartSetBehaviour selector = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
-            selector._DataReferenceSets = listSet;
-            selector._GeneralDataReferenceSets = null;
             if (selector.GetComponent<HorizontalSelector>() != null)
             {
-                selector.GetComponent<HorizontalSelector>().enableIndicators = listSet._DataRefLists.Count > 1;
+                var hSelect = selector.GetComponent<HorizontalSelector>();
+                hSelect.enableIndicators = listSet._DataRefLists.Count > 1;
+                hSelect.onValueChanged.RemoveAllListeners();
+                hSelect.Awake();
+                
             }
-            selector.Init();
+            selector._DataReferenceSets = listSet;
+            selector._GeneralDataReferenceSets = null;
+
+            selector.OnIndexChanged.RemoveAllListeners();
+            selector.Awake();
         }
         void SetupConfigPanel(string PanelLabel)
         {
@@ -166,6 +172,8 @@ namespace BmxStreetsUI.Components
                 config.currentDataIndex = 0;
                 config.OnChangedSelection = new UnityEvent();
                 config.OnChangeSelected_Int = new DataConfigPanelIntCallback();
+                config._dataSetMenuTree = null;
+                config._hasBeenPopulated = false;
                 config.Start();
                 config.Init();
                 config.Validate();

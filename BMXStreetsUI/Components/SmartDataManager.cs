@@ -42,7 +42,7 @@ namespace BmxStreetsUI.Components
             SmartType._value = FloatData;
             data.name = option.title + "Object";
             SmartType._label = option.title;
-            SmartType._identifyer = option.title;
+            SmartType._identifyer = option.title; // the identifier is used in loading, when a container loads from disk, it takes the bytes and looks for a smartdata in its list whose id matches, then populates
             data._description = option.description;
             data.SetData(SmartType);
 
@@ -85,7 +85,7 @@ namespace BmxStreetsUI.Components
             container.SetDefaultValue();
             // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
             container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
-            container.dataIdentifiers.categoryName = saveName;
+            container.dataIdentifiers.categoryName = folder; // folderName in locallow/mash/containers/
             container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
             container.dataIdentifiers.categories.Add(saveName);
             container._localizedLabel = name;

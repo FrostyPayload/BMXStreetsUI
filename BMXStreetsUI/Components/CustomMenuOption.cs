@@ -28,7 +28,8 @@
         /// derived classes override the target of this
         /// </summary>
         internal Action<Il2CppSystem.Object> ValueCallBack { get; private set; }
-
+        internal Action SelectCallBack { get; private set; }
+        internal Action DeSelectCallBack { get; private set; }
         internal void SetUIStyle(UIStyle style)
         {
             UIStyle = style;
@@ -40,11 +41,11 @@
         /// <param name="callback"></param>
         protected virtual void OnCallBackValue(Il2CppSystem.Object obj)
         {
-            Log.Msg("Value Callback");
+            Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()} : {obj.ToString()}");
         }
         public virtual void OnCallBack()
         {
-            Log.Msg($"Void Callback");
+            Log.Msg($"OnCallBack received");
         }
         public virtual float GetMax()
         {
@@ -62,7 +63,22 @@
         {
             return new Il2CppSystem.Collections.Generic.List<string>();
         }
-
+        /// <summary>
+        /// Set a callback to happen when this option becomes the highlighted selection in the UI
+        /// </summary>
+        /// <param name="actionWhenSelected"></param>
+        public void SetOnSelected(Action actionWhenSelected)
+        {
+            this.SelectCallBack = actionWhenSelected;
+        }
+        /// <summary>
+        /// Set a callback for when this option stops being the chosen selection in the UI
+        /// </summary>
+        /// <param name="actionWhenDeSelected"></param>
+        public void SetOnDeSelected(Action actionWhenDeSelected)
+        {
+            this.DeSelectCallBack = actionWhenDeSelected;
+        }
     }
     public enum UIStyle { Button, Toggle, Slider, SteppedInt }
 

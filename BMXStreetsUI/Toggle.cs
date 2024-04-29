@@ -19,10 +19,11 @@ namespace BmxStreetsUI
         }
         protected override void OnCallBackValue(Il2CppSystem.Object obj)
         {
-            Log.Msg($"Toggle callback received with type {obj.GetIl2CppType().ToString()}");
+            base.OnCallBackValue(obj);
+            Log.Msg($"Toggle callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
-                float value = BitConverter.ToSingle(BitConverter.GetBytes(obj.Pointer.ToInt64()));
+                float value = float.Parse(obj.ToString());
                 boolCallback?.Invoke(value>0);
             }
         }

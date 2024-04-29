@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 namespace BmxStreetsUI
 {
     /// <summary>
@@ -14,7 +16,15 @@ namespace BmxStreetsUI
         /// Each group you place in here shows up as a tab of options inside your menu
         /// </summary>
         public List<CustomMenuOptionGroup> Groups;
+        public CustomMenuPallete? pallete;
+        public void SetOnOpen(Action OnMenuOpened)
+        {
 
+        }
+        public void SetOnClose(Action OnMenuClosed)
+        {
+
+        }
         public CustomMenu(string title, List<CustomMenuOptionGroup> groups) 
         { 
             this.TabTitle = title;
