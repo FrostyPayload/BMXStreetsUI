@@ -1,4 +1,5 @@
 ﻿
+using BmxStreetsUI.Components;
 using UnityEngine;
 
 namespace BmxStreetsUI
@@ -16,7 +17,10 @@ namespace BmxStreetsUI
         /// Each group you place in here shows up as a tab of options inside your menu
         /// </summary>
         public List<CustomMenuOptionGroup> Groups;
-        public CustomMenuPallete? pallete;
+        public UIPanel? panel;
+        public CustomMenuPallete pallete;
+        public bool overridePallete;
+        Action<int>? OnTabChange;
         public void SetOnOpen(Action OnMenuOpened)
         {
 
@@ -24,6 +28,10 @@ namespace BmxStreetsUI
         public void SetOnClose(Action OnMenuClosed)
         {
 
+        }
+        public void SetOnTabChanged(Action<int> OnTabChanged)
+        {
+            this.OnTabChange = OnTabChanged;
         }
         public CustomMenu(string title, List<CustomMenuOptionGroup> groups) 
         { 

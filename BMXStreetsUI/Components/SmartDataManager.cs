@@ -16,34 +16,38 @@ namespace BmxStreetsUI.Components
             switch (option.UIStyle)
             {
                 case UIStyle.Slider:
-                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
+                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
                 case UIStyle.SteppedInt:
-                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
                 case UIStyle.Button:
-                    return SetupButton(ScriptableObject.CreateInstance<SmartData_Button>(), option);
+                    return SetupButton(CreateDefaultSmartData<SmartData_Button>(option.title), option);
                 case UIStyle.Toggle:
-                    return SetupSlider(ScriptableObject.CreateInstance<SmartData_Float>(), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
 
             }
             return ScriptableObject.CreateInstance<SmartData_Float>();
         }
         static SmartData SetupSlider(SmartData_Float data, CustomMenuOption option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
         {
+            data._description = option.description;
             data._dataUIStyle = uiStyle;
+            data._defaultValue = option.defaultValue;
+            data.OnBelowSignificantValue = new UnityEvent();
+            data.OnSignificantValueCrossed = new UnityEvent();
+            data.OnSteppedLabelListChanged = new UnityEvent();
             var SmartType = data._mData;
             var FloatData = new SmartDataFloatStuct();
             FloatData.SetMin(option.GetMin());
             FloatData.SetMax(option.GetMax());
             FloatData._dataStyle = style;
-            FloatData.displayDecimalAccuracy = 1;
+            FloatData.displayDecimalAccuracy = 0;
+            FloatData.Value = 0;
+            FloatData._clampMinMax = true;
             FloatData._wrapMinMax = false;
-            data._mData._value = FloatData;
-
             SmartType._value = FloatData;
-            data.name = option.title + "Object";
-            SmartType._label = option.title;
-            SmartType._identifyer = option.title; // the identifier is used in loading, when a container loads from disk, it takes the bytes and looks for a smartdata in its list whose id matches, then populates
-            data._description = option.description;
+            SmartType._label = option.title;// seen in UI
+            SmartType._identifyer = option.title; // used in data matching
+
             data.SetData(SmartType);
 
             if(uiStyle == SmartData.DataUIStyle.Stepped)
@@ -65,15 +69,14 @@ namespace BmxStreetsUI.Components
             data._mData._value = btnData;
             data._dataUIStyle = SmartData.DataUIStyle.Button;
             SmartType._value = btnData;
-            data.name = option.title + "Object";
-            SmartType._label = option.title;
-            SmartType._identifyer = option.title;
-            data._description = option.description;
+            SmartType._label = option.title; // seen in UI
+            SmartType._identifyer = option.title; // used in data matching
+            data._description = option.description; // seen in UI
             data.SetData(SmartType);
             return data;
         }
 
-        public static SmartDataContainer GetNewContainer(string saveName, string folder = "")
+        public static SmartDataContainer CreateNewContainer(string saveName, string folder = "")
         {
             var container = ScriptableObject.CreateInstance<SmartDataContainer>();
             var name = new UnityEngine.Localization.LocalizedString();
@@ -100,7 +103,6 @@ namespace BmxStreetsUI.Components
 
             return container;
         }
-
         public static SmartDataContainerReferenceListSet CreateNewSet(string name)
         {
             var listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
@@ -119,6 +121,21 @@ namespace BmxStreetsUI.Components
             list.OnDataChangeableChanged = new UnityEvent();
             list.OnValueChanged_DataValue = new SmartDataEvent();
             return list;
+        }
+
+        static T CreateDefaultSmartData<T>(string name) where T : SmartData
+        {
+            var data = ScriptableObject.CreateInstance<T>();
+            data.name = name + "_SmartObject";
+            data.OnDataChangeableChanged = new UnityEvent();
+            data.DataChangeableCallback = new BoolCallBackEvent();
+            data.OnValueChanged_DataValue = new SmartDataEvent();
+            data.OnValueChanged = new UnityEvent();
+            data._visibilityCompare = SmartData.VisibilityCompare.EqualTo;
+            data.referencedVisibilityValue = 0;
+            
+
+            return data;
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using MelonLoader;
+﻿using BmxStreetsUI.Components;
+using Il2Cpp;
+using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(BmxStreetsUI.Components.StreetsUIMelon), "BMX Streets UI", "version", "Author Name")]
+[assembly: MelonInfo(typeof(StreetsUIMelon), "BmxStreetsUI", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
 
 namespace BmxStreetsUI.Components
@@ -18,18 +20,25 @@ namespace BmxStreetsUI.Components
 
     public class StreetsUIMelon : MelonMod
     {
-        bool init;
         public override void OnInitializeMelon()
         {
             Log.logger = LoggerInstance;
+
+        }
+        public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+        {
+            if (!API.init)
+            {
+                if (sceneName.ToLower().Contains(Constants.MainMenuSceneName))
+                {
+                    API.Initialize();
+                }
+
+            }
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            if(GameObject.Find(Constants.SystemTabSettings) != null && !init)
-            {
-                Log.Msg("StreetsUI Initializing");
-                init = API.Initialize();
-            }
+            
         }
     }
 

@@ -5,9 +5,11 @@
     /// </summary>
     public abstract class CustomMenuOption
     {
-        public CustomMenuOption(string title, string description = "")
+        public CustomMenuOption(string title, string description = "",float defaultValue = 0)
         {
             this.title = title;
+            this.description = description;
+            this.defaultValue = defaultValue;
             VoidCallBack = OnCallBack;
             ValueCallBack = OnCallBackValue;
         }
@@ -19,6 +21,7 @@
         /// Description that pops up on the right as you edit a value, the presence of any data here makes the panel show up
         /// </summary>
         public string description;
+        public float defaultValue;
         internal UIStyle UIStyle { get; private set; }
         /// <summary>
         /// the button just resets this instead of having its own
@@ -41,7 +44,7 @@
         /// <param name="callback"></param>
         protected virtual void OnCallBackValue(Il2CppSystem.Object obj)
         {
-            Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()} : {obj.ToString()}");
+            Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()}");
         }
         public virtual void OnCallBack()
         {

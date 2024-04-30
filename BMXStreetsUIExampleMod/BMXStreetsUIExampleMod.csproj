@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BMXStreetsUI\BmxStreetsUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\BMXStreetsUI\dependencies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="BmxStreetsUI">
-      <HintPath>BmxStreetsUI.dll</HintPath>
     </Reference>
     <Reference Include="Il2CppInterop.Runtime">
       <HintPath>..\BMXStreetsUI\dependencies\Il2CppInterop.Runtime.dll</HintPath>

@@ -1,6 +1,7 @@
 ﻿using BmxStreetsUI.Components;
 using Il2CppInterop.Runtime;
 using Il2CppSystem.Runtime.InteropServices;
+using static Il2Cpp.SECTR_Chunk;
 
 namespace BmxStreetsUI
 {
@@ -11,7 +12,7 @@ namespace BmxStreetsUI
     {
         Action<int> IntCallback;
         public Il2CppSystem.Collections.Generic.List<string> choices;
-        public SteppedInt(string title, string description = "") : base(title, description)
+        public SteppedInt(string title, string description = "",float defaultIndex = 0) : base(title, description,defaultIndex)
         {
             SetUIStyle(UIStyle.SteppedInt);
             choices = new Il2CppSystem.Collections.Generic.List<string>();
@@ -22,8 +23,7 @@ namespace BmxStreetsUI
             Log.Msg($"SteppedInt callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
-                var val = obj.Pointer;
-                float value = float.Parse(obj.ToString());
+                float value = obj.Unbox<float>();
                 IntCallback?.Invoke((int)value);
             }
         }

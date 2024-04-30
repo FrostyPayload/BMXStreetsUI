@@ -10,12 +10,13 @@ namespace BmxStreetsUI
     public class Slider : CustomMenuOption
     {
         Action<float> floatcallback;
-        public float max, min, value;
-        public Slider(string title, float min, float max, string description = "") : base(title, description)
+        public float max, min;
+        public Slider(string title, float min, float max, string description = "", float defaultValue = 0) : base(title, description,defaultValue)
         {
             SetUIStyle(UIStyle.Slider);
             this.min = min;
             this.max = max;
+            
         }
         public override float GetMax()
         {
@@ -31,11 +32,11 @@ namespace BmxStreetsUI
             Log.Msg("Slider callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
-                //float value = obj;
-                //floatcallback?.Invoke(obj);
-                
+                float value = obj.Unbox<float>();
+                floatcallback?.Invoke(value);
             }
         }
+        
         public void SetCallBack(Action<float> callback)
         {
             this.floatcallback = callback;

@@ -17,7 +17,7 @@ namespace BmxStreetsUI.Components
         public UIPanel(IntPtr ptr) : base(ptr) { }
         public UIPanel() : base(ClassInjector.DerivedConstructorPointer<UIPanel>()) => ClassInjector.DerivedConstructorBody(this);
 
-        DataConfigPanel config;
+        public DataConfigPanel config;
         /// <summary>
         /// References a list of SmartDataContainerReferenceList, Each list turns into the options on a tab
         /// </summary>
@@ -28,21 +28,24 @@ namespace BmxStreetsUI.Components
         public MGMenu menu;
         public string PanelName = "StreetsUIpanel";
         
+        public void Init()
+        {
+            var content = transform.FindDeepChild("Content");
+            foreach (var trans in content.GetComponentsInChildren<Transform>(true))
+            {
+                if (trans.name.ToLower().Contains("data panel"))
+                {
+                    Destroy(trans.gameObject); // the existing data panels in the system tab we cloned
+                }
+            }
+        }
         /// <summary>
         /// Run once data is populated
         /// </summary>
         public void RunSetup()
         {
             Log.Msg("StreetsUI Panel Setting up");
-            var content = transform.FindDeepChild("Content");
-            foreach (var trans in content.GetComponentsInChildren<Transform>(true))
-            {
-                if (trans.name.ToLower().Contains("data panel"))
-                {
-                    //Destroy(trans.gameObject); // the existing data panels in the system tab we cloned
-                }
-            }
-
+            
             if (!GetReferences()) { Log.Msg("References failed"); return; }
             SetupConfigPanel(PanelName);
             SetupPanel();
@@ -133,10 +136,10 @@ namespace BmxStreetsUI.Components
             }
 
             if (menu == null) { Log.Msg($"No MGmenu"); return; }
-            menu.Awake();
             menu.OnEnterOpen.RemoveAllListeners();
+            menu.OnEnterOpen = null;
             if (menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
-            menu.Init();
+            menu.Awake();
 
         }
         void SetupSelectors()
@@ -146,14 +149,14 @@ namespace BmxStreetsUI.Components
             {
                 var hSelect = selector.GetComponent<HorizontalSelector>();
                 hSelect.enableIndicators = listSet._DataRefLists.Count > 1;
-                hSelect.onValueChanged.RemoveAllListeners();
+                hSelect.onValueChanged = new HorizontalSelector.SelectorEvent();
                 hSelect.Awake();
                 
             }
             selector._DataReferenceSets = listSet;
             selector._GeneralDataReferenceSets = null;
 
-            selector.OnIndexChanged.RemoveAllListeners();
+            selector.OnIndexChanged = new HorizontalSelectorSmartSetIntCallback(); // maybe hook in here instead of list's OnSelect, list's OnSelect doesnt have a deselect
             selector.Awake();
         }
         void SetupConfigPanel(string PanelLabel)
@@ -178,6 +181,15 @@ namespace BmxStreetsUI.Components
                 config.Init();
                 config.Validate();
             }
+        }
+        public void SetPallete(CustomMenuPallete pallete)
+        {
+            Log.Msg("Setting up pallete");
+            config._smartUIManagerData._paletteData.panelColor_01 = pallete.PanelOne;
+            config._smartUIManagerData._paletteData.panelColor_02 = pallete.PanelTwo;
+            config._smartUIManagerData._paletteData.selectableGraphicColorSet_01 = new UnityEngine.UI.ColorBlock { normalColor = pallete.TextNormal, highlightedColor = pallete.TextHighlighted, pressedColor = pallete.TextSelected };
+            config._smartUIManagerData._paletteData.InvokeDataChangedEvent();
+            config._smartUIManagerData.InvokePaletteChangeEvent();
         }
        
     }

@@ -9,19 +9,15 @@ namespace BmxStreetsUI.Components
 {
     public class PanelCreator
     {
+        public PanelCreator(GameObject tab, GameObject panel)
+        {
+            this.systemSettingsTab = tab;
+            this.systemSettingsPanel = panel;
+        }
+        GameObject systemSettingsPanel, systemSettingsTab;
         GameObject? tab, Panel;
         public virtual bool Create(CustomMenu newmenu)
         {
-            GameObject systemSettingsPanel = GameObject.Find(Constants.SystemTabSettings);
-            var systemSettingsTab = GameObject.Find("SYSTEM-TAB");
-            if (systemSettingsPanel == null) // does it need to be active for .Find()
-            {
-                systemSettingsPanel = UnityEngine.Object.FindObjectsByType<MGMenu>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-                                                        .Where(menu => menu.gameObject.name.ToLower()
-                                                                                           .Contains(Constants.SystemTabSettings))
-                                                        .FirstOrDefault().gameObject;
-            }
-
             if (systemSettingsPanel != null && systemSettingsTab != null)
             {
                 Log.Msg($"Setting up new StreetsUI");
@@ -30,13 +26,13 @@ namespace BmxStreetsUI.Components
                 if (tab == null)
                 {
                     Log.Msg("Failed to find the system tab for duplication");
-                    OnFail();
+                    OnFail(newmenu.TabTitle);
                     return false;
                 }
                 if (Panel == null)
                 {
                     Log.Msg("failed to find the system panel for duplication");
-                    OnFail();
+                    OnFail(newmenu.TabTitle);
                     return false;
                 }
                 tab.transform.SetParent(systemSettingsTab.transform.parent, false);
@@ -48,16 +44,21 @@ namespace BmxStreetsUI.Components
                 smartui.UnRegisterEvents();
 
                 var UIPanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
+                UIPanel.Init();
                 UIPanel.transform.SetParent(systemSettingsPanel.transform.parent, false);
                 UIPanel.SetupTriggers(tab);
                 SetupData(UIPanel,newmenu);
                 UIPanel.RunSetup();
+                newmenu.panel = UIPanel;
+                
+                if(newmenu.overridePallete) UIPanel.SetPallete(newmenu.pallete);
+                
                 return true;
             }
-            Log.Msg($"Failed to create {newmenu.TabTitle} UI");
-            OnFail();
+            OnFail(newmenu.TabTitle);
             return false;
         }
+       
         void OnFail(string menuname)
         {
             Log.Msg($"Failed to Create {menuname}");
@@ -72,33 +73,32 @@ namespace BmxStreetsUI.Components
             
             // populate list with every custommenugroup, setting up each options data and callbacks
             listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
-            foreach (var tab in menu.Groups)
+            foreach (var group in menu.Groups)
             {
-                var GroupOptions = SmartDataManager.CreateNewList(tab.title);
-                var container = SmartDataManager.GetNewContainer(tab.title,menu.TabTitle);
+                var GroupSmartList = SmartDataManager.CreateNewList(group.title);
+                var container = SmartDataManager.CreateNewContainer(group.title,menu.TabTitle);
 
-                foreach(var option in tab.options)
+                foreach(var option in group.options)
                 {
                     SetupOption(option, container);
                 }
-                GroupOptions.connectedContainer = container;
-                GroupOptions._dataContainer = container;
-                GroupOptions.dataGroup = container._smartDatas;
+                GroupSmartList.connectedContainer = container;
+                GroupSmartList._dataContainer = container;
+                GroupSmartList.dataGroup = container._smartDatas;
                 container.ValidateList();
-                listSet._DataRefLists.Add(GroupOptions);
+                GroupSmartList.OnSelected = new UnityEvent();
+                if(group.SelectCallBack != null) GroupSmartList.OnSelected.AddListener(group.SelectCallBack);
+                listSet._DataRefLists.Add(GroupSmartList);
             }
             panel.PanelName = menu.TabTitle;
             panel.listSet = listSet;
+
         }
         
         protected virtual void SetupOption(CustomMenuOption option, SmartDataContainer container)
         {
             var data = SmartDataManager.CreateSmartData(option);
-            data.OnDataChangeableChanged = new UnityEvent();
-            data.DataChangeableCallback = new BoolCallBackEvent();
-            data.OnValueChanged_DataValue = new SmartDataEvent();
             data.OnValueChanged_DataValue.AddListener(option.ValueCallBack);
-            data.OnValueChanged = new UnityEvent();
             data.OnValueChanged.AddListener(option.VoidCallBack);
             data.EnableDataChangeable();
             container._smartDatas.Add(data);
