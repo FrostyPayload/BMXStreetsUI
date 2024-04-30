@@ -4,6 +4,18 @@
 
 TODO
 
+### Support multiple types of UI
+currently supporting a new main menu tab.
+Adding support for adding values to an existing menu would involve injecting new data into their `smartContainer`, Which is `saveloadable`. corruption is maybe possible.
+
+The game appears to load on `main scene` enter by grabbing a `SaveLoader` Singleton object from the scene which is pre-populated with a list of `SaveLoadHandler` scriptableObjects (`Smartcontainers` with save load handler functions).
+Then, it calls load for all `SaveLoadHandler` present. The handlers load the `bytes` from disk using the `name` and `folder` strings of the container. Once they have the `bytes`, they deserialize them into a `List<Object>` and look for a fieldInfo called `dataIdentifyer` in each object.
+If the field is present, it enumerates the container's `SmartData` to match the identifyer string, if successful, the `SmartData` receives the object and sets it's data from it.
+
+If we were to inject a new list of data to the `SmartContainer` of the General options, save it, then remove the mod, on reload of the scene our list wouldn't be present in the `SmartContainer` found on in the Scene `SaveLoader`. Meaning that the `SaveLoadHandler` should load the `Bytes`
+and the `list<object>` should contain our new data, but the `SmartContainer` won't have a matching `dataIdentifyer` and, crucially, won't have it in it's container.
+
+
 ### SaveLoad
 Provide saveload system, either using in game system or separate
 
