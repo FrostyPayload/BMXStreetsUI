@@ -33,7 +33,6 @@ namespace BmxStreetsUI.Components
                 {
                     API.Initialize();
                 }
-
             }
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)

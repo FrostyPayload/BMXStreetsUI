@@ -138,7 +138,7 @@ namespace BmxStreetsUI.Components
 
             if (menu == null) { Log.Msg($"No MGmenu"); return; }
             menu.OnEnterOpen.RemoveAllListeners();
-            menu.OnEnterOpen = null;
+            menu.OnEnterOpen = new UnityEvent();
             if (menu.OnOpenRaiseEvents != null) menu.OnOpenRaiseEvents.Clear();
             menu.Awake();
 

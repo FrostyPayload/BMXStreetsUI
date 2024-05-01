@@ -1,12 +1,9 @@
 ﻿using BmxStreetsUI.Components;
 using Il2Cpp;
 using Il2CppMG_UI.MenuSytem;
-using Il2CppTMPro;
 using MelonLoader;
-using Unity.IL2CPP.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Localization.Components;
 
 namespace BmxStreetsUI
 {
@@ -15,9 +12,9 @@ namespace BmxStreetsUI
     /// </summary>
     public static class API
     {
-        static List<CustomMenu> CallsWaiting = new List<CustomMenu>();
+        static List<(CustomMenu,AutoTabSetup)> CallsWaiting = new List<(CustomMenu, AutoTabSetup)>();
         static GameObject? settingsPanel, settingsTab,MainMenu,ModMenu;
-        internal static bool init { get; private set; }
+        public static bool init { get; private set; }
 
         internal static void Initialize()
         {
@@ -136,13 +133,13 @@ namespace BmxStreetsUI
             }
             return null;
         }
-
+       
         static void CompleteAwaiting()
         {
             Log.Msg($"Completing Awaiting UI Setups");
-            foreach (CustomMenu menu in CallsWaiting)
+            foreach ((CustomMenu menu,AutoTabSetup setup) in CallsWaiting)
             {
-                CreatePanel(menu);
+                CreatePanel(menu,setup);
                 if(menu.AutoLoad)
                 {
                     menu.Load();
@@ -153,46 +150,53 @@ namespace BmxStreetsUI
         }
 
         /// <summary>
-        /// Create a CustomMenu and use the other classes in this namespace to setup your menu, then bring it here to have it created and setup as a main menu option
+        /// Simple Setup, Pass your Menu in here to have it auto setup to the Mod tab, optionally you can choose to auto setup to the main menu or choose custom to just get the panel without tab
         /// </summary>
         /// <param name="newMenu"></param>
-        /// <returns>Did the creation succeed. On fail, check unity logs for info</returns>
-        public static bool CreatePanel(CustomMenu newMenu, UICreator? creator = null,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu)
+        /// <returns>Returns true in two instances, 1) the panel was created and is ready to use. 2) The UI isn't ready yet but the API is holding your menu and will create it when the UI is loaded.
+        /// In this case you will need to wait until your menu is populated before using it</returns>
+        public static bool CreatePanel(CustomMenu newMenu,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu, UICreator? creator = null)
         {
             if (init)
             {
-                var panelCreator = creator;
-                if(panelCreator == null)
+                var UICreator = creator;
+                if(UICreator == null)
                 {
-                    panelCreator = new UICreator();
+                    UICreator = new UICreator();
                 }
-                var panel = panelCreator.CreatePanel(newMenu,settingsPanel);
+                var panel = UICreator.CreatePanel(newMenu,settingsPanel);
                 if (tabSetup == AutoTabSetup.ToMainMenu)
                 {
-                    var tab = panelCreator.CreateTab(newMenu.TabTitle, settingsTab);
+                    var tab = UICreator.CreateTab(newMenu.TabTitle, settingsTab);
                     LinkTabClickToAction(tab, newMenu.panel.OnOpen);
                 }
                 else if(tabSetup == AutoTabSetup.ToModMenu)
                 {
-                    var tab = panelCreator.CreateTab(newMenu.TabTitle, settingsTab,ModMenu.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
+                    var tab = UICreator.CreateTab(newMenu.TabTitle, settingsTab,ModMenu.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
                     LinkTabClickToAction(tab, newMenu.panel.OnOpen);
                 }
+                newMenu.OnMenuCreation?.Invoke(newMenu);
                 return true;
             }
             else
             {
-                if (!CallsWaiting.Contains(newMenu))
+                if (!CallsWaiting.Contains((newMenu,tabSetup)))
                 {
-                    CallsWaiting.Add(newMenu);
+                    CallsWaiting.Add((newMenu, tabSetup));
                     return true;
                 }
                 return false;
             }
         }
 
-        public static void LinkTabClickToAction(GameObject tab, Action action)
+        /// <summary>
+        /// Sets up the event trigger on your tab to fire the open function of your menu
+        /// </summary>
+        /// <param name="triggerObj"></param>
+        /// <param name="action"></param>
+        public static void LinkTabClickToAction(GameObject triggerObj, Action action)
         {
-            EventTrigger trigger = tab.GetComponent<EventTrigger>();
+            EventTrigger trigger = triggerObj.GetComponent<EventTrigger>();
             foreach (var trig in trigger.triggers)
             {
                 if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
@@ -239,7 +243,6 @@ namespace BmxStreetsUI
         {
             ToMainMenu,ToModMenu,Custom
         }
-
     }
 
    

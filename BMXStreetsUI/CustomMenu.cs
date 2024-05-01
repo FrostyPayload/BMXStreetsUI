@@ -24,6 +24,11 @@ namespace BmxStreetsUI
         Action<int>? OnTabChange;
         public bool AutoLoad = true;
         public bool AutoSave = true;
+        /// <summary>
+        /// The funtion to run as soon as the Menu is created.
+        /// </summary>
+        public Action<CustomMenu>? OnMenuCreation;
+        
 
         /// <summary>
         /// loads data from locallow/Mash/Containers/{steamId}/{TabTitle}/{TabTitle}.container. Creates directory and file as needed, as each loaded value is matched with data in your menu, the options callback will fire with the loaded value.
