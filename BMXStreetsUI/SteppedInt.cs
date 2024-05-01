@@ -1,7 +1,5 @@
 ﻿using BmxStreetsUI.Components;
 using Il2CppInterop.Runtime;
-using Il2CppSystem.Runtime.InteropServices;
-using static Il2Cpp.SECTR_Chunk;
 
 namespace BmxStreetsUI
 {

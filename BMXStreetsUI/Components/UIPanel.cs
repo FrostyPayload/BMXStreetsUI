@@ -27,7 +27,9 @@ namespace BmxStreetsUI.Components
         /// </summary>
         public MGMenu menu;
         public string PanelName = "StreetsUIpanel";
-        
+
+        public UnityEvent<int> OnOpenEvent, OnCloseEvent,OnTabChanged;
+
         public void Init()
         {
             var content = transform.FindDeepChild("Content");
@@ -47,17 +49,12 @@ namespace BmxStreetsUI.Components
             Log.Msg("StreetsUI Panel Setting up");
             
             if (!GetReferences()) { Log.Msg("References failed"); return; }
-            SetupConfigPanel(PanelName);
             SetupPanel();
             SetupSelectors();
-            var saveLoad = Singleton<SaveLoadManager>.GetInstance();
-            if (saveLoad != null)
-            {
-                Log.Msg($"Save load system found, adding data");
-                saveLoad.dataList.Add(listSet);
-            }
+            SetupConfigPanel(PanelName);
+            menu.GetMenuSystem().OnClose.AddListener(new System.Action(() => { foreach (var list in listSet._DataRefLists) { list.Save(); } }));
         }
-        public void SetupTriggers(GameObject tab)
+        public void LinkToMainMenu(GameObject tab)
         {
             EventTrigger trigger = tab.GetComponent<EventTrigger>();
             foreach (var trig in trigger.triggers)
@@ -86,7 +83,7 @@ namespace BmxStreetsUI.Components
             }
 
         }
-        void OnOpen()
+        public void OnOpen()
         {
             Log.Msg($"{PanelName} panel opening");
             if (menu.GetMenuSystem() == null)
@@ -98,9 +95,9 @@ namespace BmxStreetsUI.Components
             InputSystemEventCallback inputCancel = GetComponent<InputSystemEventCallback>();
             inputCancel.OnActionPerformed.RemoveAllListeners();
             inputCancel.OnActionPerformed.AddListener(new System.Action(() => { OnClose(); }));
-
+            OnOpenEvent?.Invoke(config.currentDataIndex);
         }
-        void OnClose()
+        public void OnClose()
         {
             Log.Msg($"{PanelName} panel closing");
             if (menu.linkedPreviousMenu == null)
@@ -112,6 +109,7 @@ namespace BmxStreetsUI.Components
             inputCancel.OnActionPerformed.RemoveAllListeners();
             inputCancel.OnActionPerformedPositive.RemoveAllListeners();
             gameObject.SetActive(false);
+            OnCloseEvent?.Invoke(config.currentDataIndex);
         }
         bool GetReferences()
         {
@@ -123,14 +121,17 @@ namespace BmxStreetsUI.Components
         {
             Log.Msg($"Setup {PanelName}");
             gameObject.name = PanelName;
-            foreach (var transform in transform)
+            foreach (var transform in gameObject.transform)
             {
                 if (transform is Transform)
                 {
                     var trans = (Transform)transform;
-                    if (trans.gameObject.GetComponent<LocalizeStringEvent>() != null)
+                    if(trans.gameObject != null)
                     {
-                        trans.gameObject.GetComponent<LocalizeStringEvent>().enabled = false;
+                        if (trans.gameObject.GetComponent<LocalizeStringEvent>() != null)
+                        {
+                            trans.gameObject.GetComponent<LocalizeStringEvent>().enabled = false;
+                        }
                     }
                 }
             }
@@ -149,15 +150,16 @@ namespace BmxStreetsUI.Components
             {
                 var hSelect = selector.GetComponent<HorizontalSelector>();
                 hSelect.enableIndicators = listSet._DataRefLists.Count > 1;
-                hSelect.onValueChanged = new HorizontalSelector.SelectorEvent();
-                hSelect.Awake();
+                //hSelect.onValueChanged = new HorizontalSelector.SelectorEvent();
+               // hSelect.Awake();
                 
             }
             selector._DataReferenceSets = listSet;
             selector._GeneralDataReferenceSets = null;
-
-            selector.OnIndexChanged = new HorizontalSelectorSmartSetIntCallback(); // maybe hook in here instead of list's OnSelect, list's OnSelect doesnt have a deselect
-            selector.Awake();
+            selector.OnIndexChanged.RemoveListener(new System.Action<int>(data => OnChangeTab(data)));
+            selector.OnIndexChanged.AddListener(new System.Action<int>(data => OnChangeTab(data)));
+           // selector.OnIndexChanged = new HorizontalSelectorSmartSetIntCallback(); // maybe hook in here instead of list's OnSelect, list's OnSelect doesnt have a deselect
+           // selector.Awake();
         }
         void SetupConfigPanel(string PanelLabel)
         {
@@ -175,12 +177,20 @@ namespace BmxStreetsUI.Components
                 config.currentDataIndex = 0;
                 config.OnChangedSelection = new UnityEvent();
                 config.OnChangeSelected_Int = new DataConfigPanelIntCallback();
+                config._UIHorizontalSelectorSmartSetBehaviour = GetComponentInChildren<UIHorizontalSelectorSmartSetBehaviour>(true);
+                config.OnChangeSelected_Int.AddListener(new System.Action<int>((val) => OnChangeTab(val)));
                 config._dataSetMenuTree = null;
                 config._hasBeenPopulated = false;
+                
                 config.Start();
                 config.Init();
                 config.Validate();
             }
+        }
+        void OnChangeTab(int value)
+        {
+            Debug.Log($"On Change tab {value}");
+            OnTabChanged?.Invoke(config.currentDataIndex);
         }
         public void SetPallete(CustomMenuPallete pallete)
         {

@@ -1,5 +1,4 @@
 ﻿using Il2Cpp;
-using Il2CppMG_UI.MenuSytem;
 using Il2CppTMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,62 +6,39 @@ using UnityEngine.Localization.Components;
 
 namespace BmxStreetsUI.Components
 {
-    public class PanelCreator
+    public class UICreator
     {
-        public PanelCreator(GameObject tab, GameObject panel)
+        GameObject? Panel;
+        public virtual GameObject? CreatePanel(CustomMenu newmenu, GameObject systemSettingsPanel,bool parentToMainRoot = true, bool RunSetup = true)
         {
-            this.systemSettingsTab = tab;
-            this.systemSettingsPanel = panel;
-        }
-        GameObject systemSettingsPanel, systemSettingsTab;
-        GameObject? tab, Panel;
-        public virtual bool Create(CustomMenu newmenu)
-        {
-            if (systemSettingsPanel != null && systemSettingsTab != null)
+            if (systemSettingsPanel != null)
             {
                 Log.Msg($"Setting up new StreetsUI");
-                 tab = UnityEngine.Object.Instantiate(systemSettingsTab);
                  Panel = UnityEngine.Object.Instantiate(systemSettingsPanel);
-                if (tab == null)
-                {
-                    Log.Msg("Failed to find the system tab for duplication");
-                    OnFail(newmenu.TabTitle);
-                    return false;
-                }
                 if (Panel == null)
                 {
                     Log.Msg("failed to find the system panel for duplication");
                     OnFail(newmenu.TabTitle);
-                    return false;
+                    return null;
                 }
-                tab.transform.SetParent(systemSettingsTab.transform.parent, false);
-                tab.GetComponent<LocalizeStringEvent>().enabled = false;
-                tab.GetComponentInChildren<TextMeshProUGUI>().text = newmenu.TabTitle;
-                tab.name = newmenu.TabTitle + "Object";
-
-                var smartui = tab.GetComponent<SmartUIBehaviour>();
-                smartui.UnRegisterEvents();
-
                 var UIPanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
                 UIPanel.Init();
-                UIPanel.transform.SetParent(systemSettingsPanel.transform.parent, false);
-                UIPanel.SetupTriggers(tab);
+                if(parentToMainRoot) UIPanel.transform.SetParent(systemSettingsPanel.transform.parent, false);
                 SetupData(UIPanel,newmenu);
-                UIPanel.RunSetup();
+                if(RunSetup) UIPanel.RunSetup();
                 newmenu.panel = UIPanel;
                 
                 if(newmenu.overridePallete) UIPanel.SetPallete(newmenu.pallete);
                 
-                return true;
+                return Panel;
             }
             OnFail(newmenu.TabTitle);
-            return false;
+            return null;
         }
-       
+        
         void OnFail(string menuname)
         {
             Log.Msg($"Failed to Create {menuname}");
-            if(tab != null) UnityEngine.GameObject.Destroy(tab);
             if (Panel != null) UnityEngine.GameObject.Destroy(Panel);
         }
         protected virtual void SetupData(UIPanel panel, CustomMenu menu)
@@ -102,6 +78,33 @@ namespace BmxStreetsUI.Components
             data.OnValueChanged.AddListener(option.VoidCallBack);
             data.EnableDataChangeable();
             container._smartDatas.Add(data);
+        }
+
+        public virtual GameObject? CreateTab(GameObject settingsTab, string TabLabel, bool parentToMain = true)
+        {
+            var tab = UnityEngine.Object.Instantiate(settingsTab);
+            if (parentToMain) tab.transform.SetParent(settingsTab.transform.parent, false);
+            tab.GetComponent<LocalizeStringEvent>().enabled = false;
+            tab.GetComponentInChildren<TextMeshProUGUI>().text = TabLabel;
+            tab.name = TabLabel + "Object";
+            var smartui = tab.GetComponent<SmartUIBehaviour>();
+            smartui.UnRegisterEvents();
+
+            return tab;
+        }
+        
+        public virtual GameObject CreateTab(string TabLabel, GameObject systemSettingsTab,Transform parent = null)
+        {
+            var toParent = parent == null ? systemSettingsTab.transform.parent : parent;
+            var tab = UnityEngine.Object.Instantiate(systemSettingsTab);
+            tab.transform.SetParent(toParent, false);
+            tab.GetComponent<LocalizeStringEvent>().enabled = false;
+            tab.GetComponentInChildren<TextMeshProUGUI>().text = TabLabel;
+            tab.name = TabLabel + "Object";
+            var smartui = tab.GetComponent<SmartUIBehaviour>();
+            smartui.UnRegisterEvents();
+
+            return tab;
         }
     }
 }

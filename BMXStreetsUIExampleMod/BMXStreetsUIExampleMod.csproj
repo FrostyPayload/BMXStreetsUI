@@ -29,6 +29,9 @@
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

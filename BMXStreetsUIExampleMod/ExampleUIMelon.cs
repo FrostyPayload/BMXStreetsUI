@@ -2,6 +2,7 @@
 using Il2Cpp;
 using BmxStreetsUI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon),"BMXStreetsUIExampleMod", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -15,43 +16,47 @@ namespace BMXStreetsUIExampleMod
         /// </summary>
         public override void OnLateInitializeMelon()
         {
-            SetupMyUI();
+             SetupMainMenuPanel();
+            //SetupMenuWithCustomEntryExit();
         }
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
-        {
-            
-        }
+
         public override void OnUpdate()
         {
-            
+            if(Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                SetupMenuWithCustomEntryExit();
+            }
         }
-        void SetupMyUI()
+        void SetupMainMenuPanel()
         {
             var groups = new List<CustomMenuOptionGroup>();
+            
+            for (int i = 0; i < 5; i++) 
+            {
+                var mygroup = new CustomMenuOptionGroup("My menu");
 
-            var mygroup = new CustomMenuOptionGroup("My menu");
+                var myslider = new Slider("MySlider", 0, 50);
+                myslider.SetCallBack(OnChangeValueFloat);
 
-            var myslider = new Slider("MySlider", 0, 50);
-            myslider.SetCallBack(OnChangeValueFloat);
+                var myButton = new Button("Mybutton", "My Buttons Description");
+                myButton.SetCallBack(OnClick);
 
-            var myButton = new Button("Mybutton", "My Buttons Description");
-            myButton.SetCallBack(OnClick);
+                var myToggle = new Toggle("MyToggle");
+                myToggle.SetCallBack(OnChangeValueBool);
 
-            var myToggle = new Toggle("MyToggle");
-            myToggle.SetCallBack(OnChangeValueBool);
+                var mysteppedInt = new SteppedInt("MySteppedInt");
+                mysteppedInt.choices.Add("Choice one");
+                mysteppedInt.choices.Add("Choice two");
+                mysteppedInt.choices.Add("Choice three");
+                mysteppedInt.SetCallBack(OnChangeValueInt);
 
-            var mysteppedInt = new SteppedInt("MySteppedInt");
-            mysteppedInt.choices.Add("Choice one");
-            mysteppedInt.choices.Add("Choice two");
-            mysteppedInt.choices.Add("Choice three");
-            mysteppedInt.SetCallBack(OnChangeValueInt);
+                mygroup.options.Add(myslider);
+                mygroup.options.Add(myButton);
+                mygroup.options.Add(myToggle);
+                mygroup.options.Add(mysteppedInt);
 
-            mygroup.options.Add(myslider);
-            mygroup.options.Add(myButton);
-            mygroup.options.Add(myToggle);
-            mygroup.options.Add(mysteppedInt);
-
-            groups.Add(mygroup);
+                groups.Add(mygroup);
+            }
 
             var mymenu = new CustomMenu("MyTab", groups);
 
@@ -60,7 +65,85 @@ namespace BMXStreetsUIExampleMod
             myOptionalPallete.PanelTwo = Color.grey;
             mymenu.pallete = myOptionalPallete;
 
-            API.AddMenu(mymenu);
+            API.CreatePanel(mymenu);
+        }
+        void SetupMenuWithCustomEntryExit()
+        {
+            var groups = new List<CustomMenuOptionGroup>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                var mygroup = new CustomMenuOptionGroup("My menu");
+
+                var myslider = new Slider("MySlider", 0, 50);
+                myslider.SetCallBack(OnChangeValueFloat);
+
+                var myButton = new Button("Mybutton", "My Buttons Description");
+                myButton.SetCallBack(OnClick);
+
+                var myToggle = new Toggle("MyToggle");
+                myToggle.SetCallBack(OnChangeValueBool);
+
+                var mysteppedInt = new SteppedInt("MySteppedInt");
+                mysteppedInt.choices.Add("Choice one");
+                mysteppedInt.choices.Add("Choice two");
+                mysteppedInt.choices.Add("Choice three");
+                mysteppedInt.SetCallBack(OnChangeValueInt);
+
+                mygroup.options.Add(myslider);
+                mygroup.options.Add(myButton);
+                mygroup.options.Add(myToggle);
+                mygroup.options.Add(mysteppedInt);
+
+                groups.Add(mygroup);
+            }
+
+            var mymenu = new CustomMenu("MyTab", groups);
+
+            var myOptionalPallete = new CustomMenuPallete();
+            myOptionalPallete.PanelOne = Color.green;
+            myOptionalPallete.PanelTwo = Color.grey;
+            mymenu.pallete = myOptionalPallete;
+
+            if (!API.CreatePanel(mymenu))
+            {
+                LoggerInstance.Msg($"Failed to create panel");
+                return;
+            }
+            if (mymenu.panel == null)
+            {
+                LoggerInstance.Msg($"Mymenu panel is null");
+                return;
+            }
+
+            // the UIPanel should now exist in you CustomMenu.Panel field
+            foreach (var config in GameObject.FindObjectsOfType<DataConfigPanel>(true).Where(dataconfig => dataconfig.gameObject.name == "BMXS_Character Selection Menu")) 
+            {
+                foreach(var trigger in config.GetComponentsInChildren<EventTrigger>())
+                {
+                    var open = new EventTrigger.Entry();
+                    open.eventID = EventTriggerType.Submit;
+                    open.callback.AddListener(new System.Action<BaseEventData>((data) => { mymenu.panel.OnOpen(); }));
+                    trigger.triggers.Add(open);
+                    trigger.delegates.Add(open);
+                }
+               // config.OnChangedSelection.AddListener(new System.Action(() => { LoggerInstance.Msg($"Character Tab "); MyCustomCallBack(config.generalDataSet.currentSelectedIndex); }));
+               // config.GetSelectedDataScriptableObject();
+                mymenu.panel.transform.SetParent(config.transform.parent, false);
+                mymenu.panel.Init();
+                mymenu.panel.RunSetup();
+
+                break;
+                
+            }
+            return;
+
+            
+        }
+        void MyCustomCallBack(int characterIndex)
+        {
+            LoggerInstance.Msg($"custom callback received {characterIndex}");
+            
         }
         void OnChangeValueFloat(float value)
         {

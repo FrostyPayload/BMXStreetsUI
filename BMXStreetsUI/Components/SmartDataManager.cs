@@ -137,5 +137,18 @@ namespace BmxStreetsUI.Components
 
             return data;
         }
+
+        public static void RegisterWithSaveLoad<T>(T obj) where T : ScriptableObject
+        {
+            var saveload = SaveLoadManager.GetInstance();
+            if(saveload != null ) 
+            {
+                if (!saveload.dataList.Contains(obj))
+                {
+                    saveload.dataList.Add(obj);
+                    Debug.Log($"REGISTERING {obj.name} WITH SAVELOADER");
+                }
+            }
+        }
     }
 }
