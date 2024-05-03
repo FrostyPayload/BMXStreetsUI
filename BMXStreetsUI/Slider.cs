@@ -6,7 +6,7 @@ namespace BmxStreetsUI
     /// <summary>
     /// Give a name, max and min value and callback. Calls back with value on change
     /// </summary>
-    public class Slider : CustomMenuOption
+    public class Slider : MenuOptionBase
     {
         Action<float> floatcallback;
         public float max, min;
@@ -35,7 +35,11 @@ namespace BmxStreetsUI
                 floatcallback?.Invoke(value);
             }
         }
-        
+
+        /// <summary>
+        /// The action to be called whenever this value is changed, is also called when the underlying data receives loaded values
+        /// </summary>
+        /// <param name="callback"></param>
         public void SetCallBack(Action<float> callback)
         {
             this.floatcallback = callback;

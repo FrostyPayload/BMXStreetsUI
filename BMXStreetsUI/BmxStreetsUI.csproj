@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -77,9 +77,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\BMX Streets\Mods" />
-  </Target>
 
 </Project>

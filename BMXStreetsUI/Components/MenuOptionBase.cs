@@ -3,9 +3,9 @@
     /// <summary>
     /// The base class which sliders,toggles,buttons,steppedInt's inherit from.
     /// </summary>
-    public abstract class CustomMenuOption
+    public abstract class MenuOptionBase
     {
-        public CustomMenuOption(string title, string description = "",float defaultValue = 0)
+        public MenuOptionBase(string title, string description = "",float defaultValue = 0)
         {
             this.title = title;
             this.description = description;
@@ -22,6 +22,8 @@
         /// </summary>
         public string description;
         public float defaultValue;
+        public int decimalPlaces = 1;
+        public string DataUnit;
         internal UIStyle UIStyle { get; private set; }
         /// <summary>
         /// the button just resets this instead of having its own

@@ -6,7 +6,7 @@ namespace BmxStreetsUI
     /// <summary>
     /// You provide a list of strings to display, the index of the selection is sent back to you on change of the value;
     /// </summary>
-    public class SteppedInt : CustomMenuOption
+    public class SteppedInt : MenuOptionBase
     {
         Action<int> IntCallback;
         public Il2CppSystem.Collections.Generic.List<string> choices;
@@ -25,6 +25,11 @@ namespace BmxStreetsUI
                 IntCallback?.Invoke((int)value);
             }
         }
+
+        /// <summary>
+        /// The action to be called whenever this value is changed, is also called when the underlying data receives loaded values
+        /// </summary>
+        /// <param name="callback"></param>
         public void SetCallBack(Action<int> callback)
         {
             this.IntCallback = callback;

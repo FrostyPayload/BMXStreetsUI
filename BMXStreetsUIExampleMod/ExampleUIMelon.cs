@@ -1,9 +1,6 @@
 ﻿using MelonLoader;
-using Il2Cpp;
 using BmxStreetsUI;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using Il2CppMG_UI.MenuSytem;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon),"BMXStreetsUIExampleMod", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -12,32 +9,29 @@ namespace BMXStreetsUIExampleMod
 {
     public class ExampleUIMelon : MelonMod
     {
-        /// <summary>
-        /// The API will store UI requests that come in before the MainMenu exists and build them as the main level loads in
-        /// </summary>
         public override void OnLateInitializeMelon()
         {
-            AutoSetupModMenuTab();
-            SetupMenuAttachedToExistingButton();
+            API.RegisterForUICreation(OnUIReady);
         }
 
-        public override void OnUpdate()
+        // triggered by the API when the scene UI is loaded and ready
+        void OnUIReady()
         {
-            if(Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                SetupMenuAttachedToExistingButton();
-            }
+            AutoModMenuPanel();
+            //MenuWithCustomEntryExit();
         }
-        void AutoSetupModMenuTab()
+        // setting up a simple panel with tab in the mod menu
+        void AutoModMenuPanel()
         {
-            var groups = new List<CustomMenuOptionGroup>();
+            var groups = new List<OptionGroup>();
             
             for (int i = 0; i < 5; i++) 
             {
-                var mygroup = new CustomMenuOptionGroup("My menu");
+                var mygroup = new OptionGroup($"Panel {i}");
 
                 var myslider = new Slider("MySlider", 0, 50);
                 myslider.SetCallBack(OnChangeValueFloat);
+                myslider.decimalPlaces = 3;
 
                 var myButton = new Button("Mybutton", "My Buttons Description");
                 myButton.SetCallBack(OnClick);
@@ -59,99 +53,15 @@ namespace BMXStreetsUIExampleMod
                 groups.Add(mygroup);
             }
 
-            var mymenu = new CustomMenu("MyTab", groups);
+            var myModMenu = new MenuPanel("MyMod", groups);
 
-            var myOptionalPallete = new CustomMenuPallete();
-            myOptionalPallete.PanelOne = Color.green;
-            myOptionalPallete.PanelTwo = Color.grey;
-            mymenu.pallete = myOptionalPallete;
+            var myOptionalPalette = new MenuPalette();
+            myOptionalPalette.PanelOne = Color.green;
+            myOptionalPalette.PanelTwo = Color.grey;
+            myModMenu.palette = myOptionalPalette;
 
-            API.CreatePanel(mymenu);
-        }
-        void SetupMenuAttachedToExistingButton()
-        {
-            // create menu in the same way as an autosetup, but pass in the custom enum to stop tab creation and autosetup
-            var groups = new List<CustomMenuOptionGroup>();
-
-            for (int i = 0; i < 5; i++)
-            {
-                var mygroup = new CustomMenuOptionGroup("My menu");
-
-                var myslider = new Slider("MySlider", 0, 50);
-                myslider.SetCallBack(OnChangeValueFloat);
-
-                var myButton = new Button("Mybutton", "My Buttons Description");
-                myButton.SetCallBack(OnClick);
-
-                var myToggle = new Toggle("MyToggle");
-                myToggle.SetCallBack(OnChangeValueBool);
-
-                var mysteppedInt = new SteppedInt("MySteppedInt");
-                mysteppedInt.choices.Add("Choice one");
-                mysteppedInt.choices.Add("Choice two");
-                mysteppedInt.choices.Add("Choice three");
-                mysteppedInt.SetCallBack(OnChangeValueInt);
-
-                mygroup.options.Add(myslider);
-                mygroup.options.Add(myButton);
-                mygroup.options.Add(myToggle);
-                mygroup.options.Add(mysteppedInt);
-
-                groups.Add(mygroup);
-            }
-
-            var mymenu = new CustomMenu("MyCustomMenu", groups);
-
-            var myOptionalPallete = new CustomMenuPallete();
-            myOptionalPallete.PanelOne = Color.green;
-            myOptionalPallete.PanelTwo = Color.grey;
-            mymenu.pallete = myOptionalPallete;
-
-            mymenu.OnMenuCreation = OnMenuCreate; // we want to work on the UI after it's created, but we're calling to the API way before the UI exists.
-            if (!API.CreatePanel(mymenu, API.AutoTabSetup.Custom))
-            {
-                LoggerInstance.Msg($"Failed to create panel");
-                return;
-            }
-            
-        }
-        void OnMenuCreate(CustomMenu mymenu)
-        {
-            LoggerInstance.Msg("MyCustomMenu Created, setting up..");
-
-            MelonCoroutines.Start(WaitForCharacterTabToSetup(mymenu));
-        }
-        System.Collections.IEnumerator WaitForCharacterTabToSetup(CustomMenu mymenu)
-        {
-            yield return new WaitForSeconds(5);
-
-            // the UIPanel should now exist in you CustomMenu.Panel field, now find the button(s) that we want to use an attach the panels onOpen to the buttons EventTrigger
-            foreach (var config in GameObject.FindObjectsOfType<DataConfigPanel>(true).Where(dataconfig => dataconfig.gameObject.name.Contains("BMXS_Character Selection Menu")))
-            {
-                foreach (var trigger in config.gameObject.GetComponentsInChildren<EventTrigger>(true))
-                {
-                    LoggerInstance.Msg($"{trigger.ToString()}");
-                    //API.LinkTabClickToAction(trigger.gameObject, mymenu.panel.OnOpen);
-                    var open = new EventTrigger.Entry();
-                    open.eventID = EventTriggerType.Submit;
-                    open.callback.AddListener(new System.Action<BaseEventData>((data) => { mymenu.panel.gameObject.SetActive(true); mymenu.panel.OnOpen(); }));
-                    trigger.triggers.Add(open);
-                    trigger.delegates.Add(open);
-                    
-                    LoggerInstance.Msg($"Added trigger for {trigger.gameObject.name}");
-                }
-
-                mymenu.panel.transform.SetParent(config.transform.parent, false);
-                mymenu.panel.Init();
-                mymenu.panel.RunSetup();
-                break;
-            }
-        }
-
-        void MyCustomCallBack(int characterIndex)
-        {
-            LoggerInstance.Msg($"custom callback received {characterIndex}");
-            
+            var myNewPanel = API.CreatePanel(myModMenu);
+            LoggerInstance.Msg("AutosetupModmenuTab Complete");
         }
 
         /// Different types of callbacks used by sliders,toggles etc

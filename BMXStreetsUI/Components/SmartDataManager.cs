@@ -1,33 +1,28 @@
 ﻿using Il2Cpp;
-using Il2CppMG_Core.MG_SmartData.SaveLoad;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace BmxStreetsUI.Components
 {
-    internal class SmartDataManager
+    public class SmartDataManager
     {
-        public static SmartData CreateSmartData(CustomMenuOption option)
+        public static SmartData OptionToSmartUI(MenuOptionBase option,string identifyer)
         {
             switch (option.UIStyle)
             {
                 case UIStyle.Slider:
-                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
+                    return SetupSmartUI(CreateDefaultSmartFloat(option.title),identifyer, option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
                 case UIStyle.SteppedInt:
-                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                    return SetupSmartUI(CreateDefaultSmartFloat(option.title), identifyer, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
                 case UIStyle.Button:
                     return SetupButton(CreateDefaultSmartData<SmartData_Button>(option.title), option);
                 case UIStyle.Toggle:
-                    return SetupSlider(CreateDefaultSmartData<SmartData_Float>(option.title), option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                    return SetupSmartUI(CreateDefaultSmartFloat(option.title), identifyer, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
 
             }
             return ScriptableObject.CreateInstance<SmartData_Float>();
         }
-        static SmartData SetupSlider(SmartData_Float data, CustomMenuOption option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
+        public static SmartData SetupSmartUI(SmartData_Float data, string identifyer, MenuOptionBase option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
         {
             data._description = option.description;
             data._dataUIStyle = uiStyle;
@@ -36,20 +31,25 @@ namespace BmxStreetsUI.Components
             data.OnSignificantValueCrossed = new UnityEvent();
             data.OnSteppedLabelListChanged = new UnityEvent();
             var SmartType = data._mData;
-            var FloatData = new SmartDataFloatStuct();
+            var FloatData = SmartType._value;
             FloatData.SetMin(option.GetMin());
             FloatData.SetMax(option.GetMax());
             FloatData._dataStyle = style;
-            FloatData.displayDecimalAccuracy = 0;
+            SmartType._dataUnit = option.DataUnit;
+            //FloatData.displayDecimalAccuracy = 5;
+            //FloatData.decimalVal = option.decimalPlaces;
+            //data._needsDecimalAccuracy = option.decimalPlaces > 0 ? true : false;
+            SmartType._identifyer = identifyer;
+            SmartType._label = option.title;
             FloatData.Value = 0;
             FloatData._clampMinMax = true;
             FloatData._wrapMinMax = false;
             SmartType._value = FloatData;
-            SmartType._label = option.title;// seen in UI
-            SmartType._identifyer = option.title; // used in data matching
+            data.OnValueChanged_DataValue.AddListener(option.ValueCallBack);
+            data.OnValueChanged.AddListener(option.VoidCallBack);
+            data.EnableDataChangeable();
 
             data.SetData(SmartType);
-
             if(uiStyle == SmartData.DataUIStyle.Stepped)
             {
                 data.steppedLabelList = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
@@ -59,20 +59,22 @@ namespace BmxStreetsUI.Components
                 data.SetSteppedLabelListData(LabelList);
                 data.MatchMinMaxToSteppedList();
             }
-
             return data;
         }
-        static SmartData SetupButton(SmartData_Button data, CustomMenuOption option)
+        public static SmartData SetupButton(SmartData_Button data, MenuOptionBase option)
         {
             var SmartType = data._mData;
-            var btnData = new SmartDataButtonStuct();
-            data._mData._value = btnData;
+            var btnData = SmartType._value;
+            SmartType._value = btnData;
             data._dataUIStyle = SmartData.DataUIStyle.Button;
             SmartType._value = btnData;
             SmartType._label = option.title; // seen in UI
             SmartType._identifyer = option.title; // used in data matching
             data._description = option.description; // seen in UI
-            data.SetData(SmartType);
+            data._mData = SmartType;
+            data._OnButtonEvent = new GameEvent();
+            data._OnButtonEvent.OnRaise = new UnityEvent();
+            data._OnButtonEvent.OnRaise.AddListener(option.VoidCallBack);
             return data;
         }
 
@@ -108,6 +110,7 @@ namespace BmxStreetsUI.Components
             var listSet = ScriptableObject.CreateInstance<SmartDataContainerReferenceListSet>();
             listSet.SetName = name + "ListSet";
             listSet.name = name + "Object";
+            listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
 
             return listSet;
         }
@@ -122,8 +125,12 @@ namespace BmxStreetsUI.Components
             list.OnValueChanged_DataValue = new SmartDataEvent();
             return list;
         }
-
-        static T CreateDefaultSmartData<T>(string name) where T : SmartData
+        public static SmartData_Float CreateDefaultSmartFloat(string name)
+        {
+            var smartData = CreateDefaultSmartData<SmartData_Float>(name);
+            return smartData;
+        }
+        public static T CreateDefaultSmartData<T>(string name) where T : SmartData
         {
             var data = ScriptableObject.CreateInstance<T>();
             data.name = name + "_SmartObject";
@@ -134,21 +141,8 @@ namespace BmxStreetsUI.Components
             data._visibilityCompare = SmartData.VisibilityCompare.EqualTo;
             data.referencedVisibilityValue = 0;
             
-
             return data;
         }
 
-        public static void RegisterWithSaveLoad<T>(T obj) where T : ScriptableObject
-        {
-            var saveload = SaveLoadManager.GetInstance();
-            if(saveload != null ) 
-            {
-                if (!saveload.dataList.Contains(obj))
-                {
-                    saveload.dataList.Add(obj);
-                    Debug.Log($"REGISTERING {obj.name} WITH SAVELOADER");
-                }
-            }
-        }
     }
 }
