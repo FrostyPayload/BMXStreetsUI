@@ -3,9 +3,9 @@
     /// <summary>
     /// The base class which sliders,toggles,buttons,steppedInt's inherit from.
     /// </summary>
-    public abstract class CustomMenuOption
+    public abstract class MenuOptionBase
     {
-        public CustomMenuOption(string title, string description = "",float defaultValue = 0)
+        public MenuOptionBase(string title, string description = "",float defaultValue = 0)
         {
             this.title = title;
             this.description = description;
@@ -22,6 +22,8 @@
         /// </summary>
         public string description;
         public float defaultValue;
+        public int decimalPlaces = 1;
+        public string DataUnit;
         internal UIStyle UIStyle { get; private set; }
         /// <summary>
         /// the button just resets this instead of having its own
@@ -42,19 +44,19 @@
         /// Derived classes override this to provide more specific objects to their listeners.
         /// </summary>
         /// <param name="callback"></param>
-        protected virtual void OnCallBackValue(Il2CppSystem.Object obj)
+        internal virtual void OnCallBackValue(Il2CppSystem.Object obj)
         {
             Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()}");
         }
-        public virtual void OnCallBack()
+        internal virtual void OnCallBack()
         {
             Log.Msg($"OnCallBack received");
         }
-        public virtual float GetMax()
+        internal virtual float GetMax()
         {
             return 1;
         }
-        public virtual float GetMin()
+        internal virtual float GetMin()
         {
             return 0;
         }
@@ -62,7 +64,7 @@
         /// Toggles and steppedInt's are powered by this list,max and min are set by the count. Toggles simply give back on and off labels and return 0 or 1
         /// </summary>
         /// <returns></returns>
-        public virtual Il2CppSystem.Collections.Generic.List<string> GetLabels()
+        internal virtual Il2CppSystem.Collections.Generic.List<string> GetLabels()
         {
             return new Il2CppSystem.Collections.Generic.List<string>();
         }

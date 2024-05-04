@@ -29,6 +29,13 @@
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\BMXStreetsUI\dependencies\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="move &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\BMX Streets\Mods&quot;&#xD;&#xA;move &quot;$(SolutionDir)bin\$(Configuration)\net6.0\BMXStreetsUI.dll&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\BMX Streets\Mods&quot;" />
+  </Target>
 
 </Project>

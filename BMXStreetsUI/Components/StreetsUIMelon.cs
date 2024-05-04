@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace BmxStreetsUI.Components
 {
-    public static class BuildInfo
+    internal static class BuildInfo
     {
         public const string Name = "BmxStreetsUI"; // Name of the Mod.  (MUST BE SET)
         public const string Description = "Middleware for mods to integrate with the BMXStreets UI System"; // Description for the Mod.  (Set as null if none)
@@ -18,7 +18,7 @@ namespace BmxStreetsUI.Components
         public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
     }
 
-    public class StreetsUIMelon : MelonMod
+    internal class StreetsUIMelon : MelonMod
     {
         public override void OnInitializeMelon()
         {
@@ -27,15 +27,15 @@ namespace BmxStreetsUI.Components
         }
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
-            if (!API.init)
+            if (!API.IsReady)
             {
                 if (sceneName.ToLower().Contains(Constants.MainMenuSceneName))
                 {
                     API.Initialize();
                 }
-
             }
         }
+
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             

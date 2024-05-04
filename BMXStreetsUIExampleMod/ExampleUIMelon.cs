@@ -1,5 +1,4 @@
 ﻿using MelonLoader;
-using Il2Cpp;
 using BmxStreetsUI;
 using UnityEngine;
 
@@ -10,58 +9,63 @@ namespace BMXStreetsUIExampleMod
 {
     public class ExampleUIMelon : MelonMod
     {
-        /// <summary>
-        /// The API will store UI requests that come in before the MainMenu exists and build them as the main level loads in
-        /// </summary>
         public override void OnLateInitializeMelon()
         {
-            SetupMyUI();
+            API.RegisterForUICreation(OnUIReady);
         }
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+
+        // triggered by the API when the scene UI is loaded and ready
+        void OnUIReady()
         {
+            AutoModMenuPanel();
+        }
+        // setting up a simple panel with tab in the mod menu
+        void AutoModMenuPanel()
+        {
+            var groups = new List<OptionGroup>();
             
+            for (int i = 0; i < 5; i++) 
+            {
+                var mygroup = new OptionGroup($"Panel {i}");
+
+                var myslider = new Slider("MySlider", 0, 50);
+                myslider.SetCallBack(OnChangeValueFloat);
+                myslider.decimalPlaces = 3;
+
+                var myButton = new Button("Mybutton", "My Buttons Description");
+                myButton.SetCallBack(OnClick);
+
+                var myToggle = new Toggle("MyToggle");
+                myToggle.SetCallBack(OnChangeValueBool);
+
+                var mysteppedInt = new SteppedInt("MySteppedInt");
+                mysteppedInt.choices.Add("Choice one");
+                mysteppedInt.choices.Add("Choice two");
+                mysteppedInt.choices.Add("Choice three");
+                mysteppedInt.SetCallBack(OnChangeValueInt);
+
+                mygroup.options.Add(myslider);
+                mygroup.options.Add(myButton);
+                mygroup.options.Add(myToggle);
+                mygroup.options.Add(mysteppedInt);
+
+                groups.Add(mygroup);
+            }
+
+            var myModMenu = new MenuPanel("MyMod", groups);
+
+            var myOptionalPalette = new MenuPalette();
+            myOptionalPalette.PanelOne = Color.green;
+            myOptionalPalette.PanelTwo = Color.grey;
+            myModMenu.palette = myOptionalPalette;
+
+            var myNewPanel = API.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
+            LoggerInstance.Msg("AutosetupModmenuTab Complete");
         }
-        public override void OnUpdate()
-        {
-            
-        }
-        void SetupMyUI()
-        {
-            var groups = new List<CustomMenuOptionGroup>();
 
-            var mygroup = new CustomMenuOptionGroup("My menu");
 
-            var myslider = new Slider("MySlider", 0, 50);
-            myslider.SetCallBack(OnChangeValueFloat);
 
-            var myButton = new Button("Mybutton", "My Buttons Description");
-            myButton.SetCallBack(OnClick);
-
-            var myToggle = new Toggle("MyToggle");
-            myToggle.SetCallBack(OnChangeValueBool);
-
-            var mysteppedInt = new SteppedInt("MySteppedInt");
-            mysteppedInt.choices.Add("Choice one");
-            mysteppedInt.choices.Add("Choice two");
-            mysteppedInt.choices.Add("Choice three");
-            mysteppedInt.SetCallBack(OnChangeValueInt);
-
-            mygroup.options.Add(myslider);
-            mygroup.options.Add(myButton);
-            mygroup.options.Add(myToggle);
-            mygroup.options.Add(mysteppedInt);
-
-            groups.Add(mygroup);
-
-            var mymenu = new CustomMenu("MyTab", groups);
-
-            var myOptionalPallete = new CustomMenuPallete();
-            myOptionalPallete.PanelOne = Color.green;
-            myOptionalPallete.PanelTwo = Color.grey;
-            mymenu.pallete = myOptionalPallete;
-
-            API.AddMenu(mymenu);
-        }
+        /// Different types of callbacks used by sliders,toggles etc
         void OnChangeValueFloat(float value)
         {
             LoggerInstance.Msg($"MyFloatCallBack : {value}");

@@ -78,8 +78,4 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="move &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\BMX Streets\Mods&quot;" />
-  </Target>
-
 </Project>

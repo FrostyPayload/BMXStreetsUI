@@ -1,13 +1,12 @@
 ﻿using BmxStreetsUI.Components;
 using Il2CppInterop.Runtime;
-using Il2CppSystem.Runtime.InteropServices;
 
 namespace BmxStreetsUI
 {
     /// <summary>
     /// Give a name, max and min value and callback. Calls back with value on change
     /// </summary>
-    public class Slider : CustomMenuOption
+    public class Slider : MenuOptionBase
     {
         Action<float> floatcallback;
         public float max, min;
@@ -18,15 +17,15 @@ namespace BmxStreetsUI
             this.max = max;
             
         }
-        public override float GetMax()
+        internal override float GetMax()
         {
             return max;
         }
-        public override float GetMin()
+        internal override float GetMin()
         {
             return min;
         }
-        protected override void OnCallBackValue(Il2CppSystem.Object obj)
+        internal override void OnCallBackValue(Il2CppSystem.Object obj)
         {
             base.OnCallBackValue(obj);
             Log.Msg("Slider callback received");
@@ -36,7 +35,11 @@ namespace BmxStreetsUI
                 floatcallback?.Invoke(value);
             }
         }
-        
+
+        /// <summary>
+        /// The action to be called whenever this value is changed, is also called when the underlying data receives loaded values
+        /// </summary>
+        /// <param name="callback"></param>
         public void SetCallBack(Action<float> callback)
         {
             this.floatcallback = callback;
