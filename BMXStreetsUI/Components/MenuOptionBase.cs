@@ -44,19 +44,19 @@
         /// Derived classes override this to provide more specific objects to their listeners.
         /// </summary>
         /// <param name="callback"></param>
-        protected virtual void OnCallBackValue(Il2CppSystem.Object obj)
+        internal virtual void OnCallBackValue(Il2CppSystem.Object obj)
         {
             Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()}");
         }
-        public virtual void OnCallBack()
+        internal virtual void OnCallBack()
         {
             Log.Msg($"OnCallBack received");
         }
-        public virtual float GetMax()
+        internal virtual float GetMax()
         {
             return 1;
         }
-        public virtual float GetMin()
+        internal virtual float GetMin()
         {
             return 0;
         }
@@ -64,7 +64,7 @@
         /// Toggles and steppedInt's are powered by this list,max and min are set by the count. Toggles simply give back on and off labels and return 0 or 1
         /// </summary>
         /// <returns></returns>
-        public virtual Il2CppSystem.Collections.Generic.List<string> GetLabels()
+        internal virtual Il2CppSystem.Collections.Generic.List<string> GetLabels()
         {
             return new Il2CppSystem.Collections.Generic.List<string>();
         }

@@ -27,14 +27,14 @@ namespace BmxStreetsUI.Components
         public MGMenu menu;
         public string PanelName = "StreetsUIpanel";
 
-        public UnityEvent<int> OnOpenEvent, OnCloseEvent,OnTabChanged,OnSelectionChanged;
+        public UnityEvent<int> OnOpenEvent, OnCloseEvent,OnTabChangedEvent,OnSelectionChangedEvent;
 
         public void Init()
         {
             OnOpenEvent = new UnityEvent<int>();
             OnCloseEvent = new UnityEvent<int>();
-            OnTabChanged = new UnityEvent<int>();
-            OnSelectionChanged = new UnityEvent<int>();
+            OnTabChangedEvent = new UnityEvent<int>();
+            OnSelectionChangedEvent = new UnityEvent<int>();
             var content = transform.FindDeepChild("Content");
             foreach (var trans in content.GetComponentsInChildren<Transform>(true))
             {
@@ -57,7 +57,6 @@ namespace BmxStreetsUI.Components
             SetupSelectors();
             SetupConfigPanel(PanelName);
         }
-       
         public void SetNewDataSet(SmartDataContainerReferenceListSet set,bool keepCurrentTabIndex = true,bool keepCurrentOptionIndex = true)
         {
             listSet = set;
@@ -68,57 +67,6 @@ namespace BmxStreetsUI.Components
 
         }
         
-       
-        public void SetSaveOnMenuExit()
-        {
-            if(menu.gameObject.transform.parent == null)
-            {
-                Log.Msg($"Menu system need to have parent to setup save on exit", true);
-                return;
-            }
-            var system = menu.GetMenuSystem();
-            if(system != null)
-            {
-                if(system.OnClose == null) { system.OnClose = new UnityEvent(); }
-                if (listSet == null) return;
-                if (listSet._DataRefLists == null) return;
-               system.OnClose.RemoveListener(new System.Action(() => { foreach (var list in listSet._DataRefLists) { list.Save(); } }));
-               system.OnClose.AddListener(new System.Action(() => { foreach (var list in listSet._DataRefLists) { list.Save(); } }));
-            }
-            else
-            {
-                Log.Msg($"Menu system is null when setting Save On Exit", true);
-            }
-        }
-        public void LinkToMainMenu(GameObject tab)
-        {
-            EventTrigger trigger = tab.GetComponent<EventTrigger>();
-            foreach (var trig in trigger.triggers)
-            {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
-                {
-                    if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
-                    {
-                        trig.callback.m_PersistentCalls.RemoveListener(0);
-                    }
-                    trig.callback.RemoveAllListeners();
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => { OnOpen(); }));
-                }
-            }
-            foreach (var trig in trigger.delegates)
-            {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
-                {
-                    if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
-                    {
-                        trig.callback.m_PersistentCalls.RemoveListener(0);
-                    }
-                    trig.callback.RemoveAllListeners();
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => { OnOpen(); }));
-                }
-            }
-
-        }
         public void OnOpen()
         {
             Log.Msg($"{PanelName} panel opening");
@@ -234,7 +182,7 @@ namespace BmxStreetsUI.Components
         void OnChangeTab(int value)
         {
             Debug.Log($"On Change tab {value}");
-            OnTabChanged?.Invoke(config.currentDataIndex);
+            OnTabChangedEvent?.Invoke(config.currentDataIndex);
         }
         public void SetPallete(MenuPalette pallete)
         {

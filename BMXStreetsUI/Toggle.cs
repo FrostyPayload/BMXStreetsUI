@@ -10,14 +10,14 @@ namespace BmxStreetsUI
         {
             SetUIStyle(UIStyle.Toggle);
         }
-        public override Il2CppSystem.Collections.Generic.List<string> GetLabels()
+        internal override Il2CppSystem.Collections.Generic.List<string> GetLabels()
         {
             var list = new Il2CppSystem.Collections.Generic.List<string>();
             list.Add("Off");
             list.Add("On");
             return list;
         }
-        protected override void OnCallBackValue(Il2CppSystem.Object obj)
+        internal override void OnCallBackValue(Il2CppSystem.Object obj)
         {
             base.OnCallBackValue(obj);
             Log.Msg($"Toggle callback received");

@@ -54,6 +54,28 @@ namespace BmxStreetsUI
             
         }
 
+        public static void RegisterToMainMenuOpen(Action callback)
+        {
+            if(MainMenu != null)
+            {
+                var sys = MainMenu.GetComponent<MGMenu>().GetMenuSystem();
+                if(sys != null)
+                {
+                    sys.OnOpen.AddListener(callback);
+                }
+            }
+        }
+        public static void RegisterToMainMenuClose(Action callback)
+        {
+            if (MainMenu != null)
+            {
+                var sys = MainMenu.GetComponent<MGMenu>().GetMenuSystem();
+                if (sys != null)
+                {
+                    sys.OnClose.AddListener(callback);
+                }
+            }
+        }
         public static bool InjectOptionToSystemPanel(MenuOptionBase option, SystemTab tab)
         {
             if (!IsReady)
@@ -129,7 +151,7 @@ namespace BmxStreetsUI
         }
         static void CompleteAwaiting()
         {
-            Log.Msg($"Completing Awaiting UI Setups");
+            Log.Msg($"Running OnCreation callbacks");
             while(OnCreation.Count>0)
             {
                 try
@@ -151,33 +173,70 @@ namespace BmxStreetsUI
         {
             OnCreation.Enqueue(callback);
         }
+
         public static SmartDataContainerReferenceListSet MenuToSmartSet(MenuPanel menu)
         {
-            Log.Msg($"Setting up {menu.TabTitle} UI Data");
             var listSet = SmartDataManager.CreateNewSet(menu.TabTitle);
-            // populate list with every custommenugroup, setting up each options data and callbacks
             foreach (var group in menu.Groups)
             {
-                var GroupSmartList = SmartDataManager.CreateNewList(group.title);
-                var container = SmartDataManager.CreateNewContainer(group.title, menu.TabTitle);
-
-                foreach (var option in group.options)
-                {
-                    var data = SmartDataManager.OptionToSmartUI(option, $"{group.title}_{option.title}");
-                    container._smartDatas.Add(data);
-                }
-                GroupSmartList.connectedContainer = container;
-                GroupSmartList._dataContainer = container;
-                GroupSmartList.dataGroup = container._smartDatas;
-                container.ValidateList();
-                GroupSmartList.OnSelected = new UnityEvent();
-                if (group.SelectCallBack != null) GroupSmartList.OnSelected.AddListener(group.SelectCallBack);
-                listSet._DataRefLists.Add(GroupSmartList);
+                var smartList = GroupToSmartList(group, menu.TabTitle);
+                listSet._DataRefLists.Add(smartList);
             }
             return listSet;
 
         }
-        public static GameObject? CreatePanel(MenuPanel newMenu,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu,bool setupAutoSave = true,bool setupAutoLoad = true)
+
+        /// <summary>
+        /// The returned SmartData is Serializable and either a SmartData_Float or SmartData_Button if you pass in a button.
+        /// The Id is used for inGame saveLoad and needs to be unique within a container.
+        /// </summary>
+        /// <param name="option"></param>
+        /// <param name="uniqueToContainerID"></param>
+        /// <returns></returns>
+        public static SmartData OptionToSmartUI(MenuOptionBase option, string uniqueToContainerID)
+        {
+            switch (option.UIStyle)
+            {
+                case UIStyle.Slider:
+                    return SmartDataManager.SetupSmartUI(SmartDataManager.CreateDefaultSmartFloat(option.title), uniqueToContainerID, option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
+                case UIStyle.SteppedInt:
+                    return SmartDataManager.SetupSmartUI(SmartDataManager.CreateDefaultSmartFloat(option.title), uniqueToContainerID, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+                case UIStyle.Button:
+                    return SmartDataManager.SetupButton(SmartDataManager.CreateDefaultSmartData<SmartData_Button>(option.title), option);
+                case UIStyle.Toggle:
+                    return SmartDataManager.SetupSmartUI(SmartDataManager.CreateDefaultSmartFloat(option.title), uniqueToContainerID, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
+
+            }
+            return ScriptableObject.CreateInstance<SmartData_Float>();
+        }
+
+        /// <summary>
+        /// The returned object is directly SaveLoadable. The list inside contains all your options as SmartData, each of them holds the events that will fire on change of their value.
+        /// Calling Load immediatley will attempt to populate your options with matching data from disk using the folderName and group.Title.
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
+        public static SmartDataContainerReferenceList GroupToSmartList(OptionGroup group, string folderName)
+        {
+            var container = SmartDataManager.CreateNewContainer(group.title, folderName);
+            var smartList = SmartDataManager.CreateNewList(group.title);
+            foreach (var option in group.options)
+            {
+                var data = OptionToSmartUI(option, $"{group.title}_{option.title}");
+                container._smartDatas.Add(data);
+            }
+            container.ValidateList();
+            smartList.connectedContainer = container;
+            smartList._dataContainer = container;
+            smartList.dataGroup = container._smartDatas;
+            smartList.OnSelected = new UnityEvent();
+            if (group.SelectCallBack != null) smartList.OnSelected.AddListener(group.SelectCallBack);
+
+            return smartList;
+        }
+
+        public static GameObject? CreatePanel(MenuPanel newMenu,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu,bool SetupSaveOnMainMenuExit = true,bool LoadOnCreate = true)
         {
             if (IsReady)
             {
@@ -216,8 +275,8 @@ namespace BmxStreetsUI
                 if (newMenu.OnMenuClose != null) newMenu.SetPanelOnCloseCallback(newMenu.OnMenuClose);
                 if (newMenu.OnTabChange != null) newMenu.SetPanelOnTabChangedCallback(newMenu.OnTabChange);
                 if (newMenu.OnSelectionChange != null) newMenu.SetPanelOnSelectionChangedCallback(newMenu.OnSelectionChange);
-                if(setupAutoSave) UIPanel.SetSaveOnMenuExit();
-                if (setupAutoLoad) newMenu.Load();
+                if (SetupSaveOnMainMenuExit) RegisterToMainMenuClose(new System.Action(() => { newMenu.Save(); }));
+                if (LoadOnCreate) newMenu.Load();
                 return Panel;
             }
             else
@@ -227,10 +286,16 @@ namespace BmxStreetsUI
             }
         }
 
+        /// <summary>
+        /// Parents to the mod menu if parent is null
+        /// </summary>
+        /// <param name="TabLabel"></param>
+        /// <param name="parent"></param>
+        /// <returns>The setup tab which has an EventTrigger component, use LinkTabClickToAction() to link the trigger</returns>
         public static GameObject? CreateTab(string TabLabel, Transform parent = null)
         {
             if (!IsReady) return null;
-            var toParent = parent == null ? settingsTab.transform.parent : parent;
+            var toParent = parent == null ? ModMenu.GetModMenuTabParent() : parent;
             var tab = UnityEngine.Object.Instantiate(settingsTab);
             tab.transform.SetParent(toParent, false);
             tab.GetComponent<LocalizeStringEvent>().enabled = false;
@@ -242,23 +307,28 @@ namespace BmxStreetsUI
             return tab;
         }
 
-        /// <summary>
-        /// Sets up the event trigger on your tab to fire the open function of your menu
-        /// </summary>
-        /// <param name="triggerObj"></param>
-        /// <param name="action"></param>
-        public static void LinkTabClickToAction(GameObject triggerObj, Action action)
+       /// <summary>
+       /// Hook into the Submit events of the tab
+       /// </summary>
+       /// <param name="triggerObj"></param>
+       /// <param name="action"></param>
+       /// <param name="deleteOthers"></param>
+        public static void LinkTabClickToAction(GameObject triggerObj, Action action, bool deleteOthers = true)
         {
             EventTrigger trigger = triggerObj.GetComponent<EventTrigger>();
             foreach (var trig in trigger.triggers)
             {
                 if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
                 {
-                    if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
+                    if (deleteOthers)
                     {
-                        trig.callback.m_PersistentCalls.RemoveListener(0);
+                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
+                        {
+                            trig.callback.m_PersistentCalls.RemoveListener(0);
+                        }
+                        trig.callback.RemoveAllListeners();
                     }
-                    trig.callback.RemoveAllListeners();
+                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
                     trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                 }
             }
@@ -266,11 +336,15 @@ namespace BmxStreetsUI
             {
                 if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
                 {
-                    if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
-                    {
-                        trig.callback.m_PersistentCalls.RemoveListener(0);
+                    if (deleteOthers)
+                    { 
+                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
+                        {
+                            trig.callback.m_PersistentCalls.RemoveListener(0);
+                        }
+                        trig.callback.RemoveAllListeners();
                     }
-                    trig.callback.RemoveAllListeners();
+                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
                     trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                 }
             }

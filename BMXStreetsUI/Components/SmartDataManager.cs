@@ -6,22 +6,6 @@ namespace BmxStreetsUI.Components
 {
     public class SmartDataManager
     {
-        public static SmartData OptionToSmartUI(MenuOptionBase option,string identifyer)
-        {
-            switch (option.UIStyle)
-            {
-                case UIStyle.Slider:
-                    return SetupSmartUI(CreateDefaultSmartFloat(option.title),identifyer, option, SmartDataFloatStuct.DataStyle.Free, SmartData.DataUIStyle.Slider);
-                case UIStyle.SteppedInt:
-                    return SetupSmartUI(CreateDefaultSmartFloat(option.title), identifyer, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
-                case UIStyle.Button:
-                    return SetupButton(CreateDefaultSmartData<SmartData_Button>(option.title), option);
-                case UIStyle.Toggle:
-                    return SetupSmartUI(CreateDefaultSmartFloat(option.title), identifyer, option, SmartDataFloatStuct.DataStyle.Stepped, SmartData.DataUIStyle.Stepped);
-
-            }
-            return ScriptableObject.CreateInstance<SmartData_Float>();
-        }
         public static SmartData SetupSmartUI(SmartData_Float data, string identifyer, MenuOptionBase option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
         {
             data._description = option.description;
@@ -77,7 +61,6 @@ namespace BmxStreetsUI.Components
             data._OnButtonEvent.OnRaise.AddListener(option.VoidCallBack);
             return data;
         }
-
         public static SmartDataContainer CreateNewContainer(string saveName, string folder = "")
         {
             var container = ScriptableObject.CreateInstance<SmartDataContainer>();
@@ -90,7 +73,7 @@ namespace BmxStreetsUI.Components
             container.SetDefaultValue();
             // container.CanShowDataInUI = new SmartData.BlockFromDataListRule(canshow.GetFunctionPointer());
             container.dataIdentifiers = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
-            container.dataIdentifiers.categoryName = folder; // folderName in locallow/mash/containers/
+            container.dataIdentifiers.categoryName = Path.Combine("BMXStreetsUI",folder); // folderName in locallow/mash/containers/
             container.dataIdentifiers.categories = new Il2CppSystem.Collections.Generic.List<string>();
             container.dataIdentifiers.categories.Add(saveName);
             container._localizedLabel = name;

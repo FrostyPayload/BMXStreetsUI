@@ -8,14 +8,14 @@ namespace BmxStreetsUI
     /// </summary>
     public class SteppedInt : MenuOptionBase
     {
-        Action<int> IntCallback;
+        Action<int>? IntCallback;
         public Il2CppSystem.Collections.Generic.List<string> choices;
         public SteppedInt(string title, string description = "",float defaultIndex = 0) : base(title, description,defaultIndex)
         {
             SetUIStyle(UIStyle.SteppedInt);
             choices = new Il2CppSystem.Collections.Generic.List<string>();
         }
-        protected override void OnCallBackValue(Il2CppSystem.Object obj)
+        internal override void OnCallBackValue(Il2CppSystem.Object obj)
         {
             base.OnCallBackValue(obj);
             Log.Msg($"SteppedInt callback received");
@@ -34,7 +34,7 @@ namespace BmxStreetsUI
         {
             this.IntCallback = callback;
         }
-        public override Il2CppSystem.Collections.Generic.List<string> GetLabels()
+        internal override Il2CppSystem.Collections.Generic.List<string> GetLabels()
         {
             return choices;
         }

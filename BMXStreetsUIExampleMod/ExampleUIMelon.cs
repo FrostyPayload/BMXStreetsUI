@@ -18,7 +18,6 @@ namespace BMXStreetsUIExampleMod
         void OnUIReady()
         {
             AutoModMenuPanel();
-            //MenuWithCustomEntryExit();
         }
         // setting up a simple panel with tab in the mod menu
         void AutoModMenuPanel()
@@ -60,9 +59,11 @@ namespace BMXStreetsUIExampleMod
             myOptionalPalette.PanelTwo = Color.grey;
             myModMenu.palette = myOptionalPalette;
 
-            var myNewPanel = API.CreatePanel(myModMenu);
+            var myNewPanel = API.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
             LoggerInstance.Msg("AutosetupModmenuTab Complete");
         }
+
+
 
         /// Different types of callbacks used by sliders,toggles etc
         void OnChangeValueFloat(float value)

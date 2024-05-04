@@ -27,6 +27,9 @@ namespace BmxStreetsUI
         public Action<int>? OnMenuClose;
         public Action<int>? OnTabChange;
         public Action<int>? OnSelectionChange;
+        public Action? OnSave;
+        public Action? OnLoad;
+        public List<SmartDataContainerReferenceList> lists;
 
         /// <summary>
         /// loads data from locallow/Mash/Containers/{steamId}/{TabTitle}/{TabTitle}.container. Creates directory and file as needed, as each loaded value is matched with data in your menu, the options callback will fire with the loaded value.
@@ -41,6 +44,11 @@ namespace BmxStreetsUI
                     list.Load();
                 }
             }
+            OnLoad?.Invoke();
+            foreach(var extra in lists)
+            {
+                extra.Save();
+            }
         }
         public void Save()
         {
@@ -50,6 +58,11 @@ namespace BmxStreetsUI
                 {
                     list.Save();
                 }
+            }
+            OnSave?.Invoke();
+            foreach (var extra in lists)
+            {
+                extra.Save();
             }
         }
         public void SetPanelOnOpenCallback(Action<int> OnMenuOpened)
@@ -72,22 +85,17 @@ namespace BmxStreetsUI
         {
             if (panel)
             {
-                panel.OnTabChanged.RemoveListener(Action);
-                panel.OnTabChanged.AddListener(Action);
+                panel.OnTabChangedEvent.RemoveListener(Action);
+                panel.OnTabChangedEvent.AddListener(Action);
             }
         }
         public void SetPanelOnSelectionChangedCallback(Action<int> Action)
         {
             if (panel)
             {
-                panel.OnSelectionChanged.RemoveListener(Action);
-                panel.OnSelectionChanged.AddListener(Action);
+                panel.OnSelectionChangedEvent.RemoveListener(Action);
+                panel.OnSelectionChangedEvent.AddListener(Action);
             }
-        }
-
-        public void SwapLiveGroup(OptionGroup newGroup)
-        {
-
         }
 
         public SmartDataContainerReferenceList? GetCurrentDataList()
@@ -102,6 +110,7 @@ namespace BmxStreetsUI
         { 
             this.TabTitle = title;
             this.Groups = groups;
+            this.lists = new List<SmartDataContainerReferenceList>();
         }
 
     }

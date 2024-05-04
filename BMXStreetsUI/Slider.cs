@@ -17,15 +17,15 @@ namespace BmxStreetsUI
             this.max = max;
             
         }
-        public override float GetMax()
+        internal override float GetMax()
         {
             return max;
         }
-        public override float GetMin()
+        internal override float GetMin()
         {
             return min;
         }
-        protected override void OnCallBackValue(Il2CppSystem.Object obj)
+        internal override void OnCallBackValue(Il2CppSystem.Object obj)
         {
             base.OnCallBackValue(obj);
             Log.Msg("Slider callback received");
