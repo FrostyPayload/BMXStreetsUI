@@ -85,7 +85,7 @@ namespace BmxStreetsUI.Components
             container.OnAnyValueChanged = new UnityEvent();
             container._customSearchTag = "";
             container._smartDatas = new Il2CppSystem.Collections.Generic.List<SmartData>();
-
+            GameObject.DontDestroyOnLoad(container);
             return container;
         }
         public static SmartDataContainerReferenceListSet CreateNewSet(string name)
@@ -94,7 +94,7 @@ namespace BmxStreetsUI.Components
             listSet.SetName = name + "ListSet";
             listSet.name = name + "Object";
             listSet._DataRefLists = new Il2CppSystem.Collections.Generic.List<SmartDataContainerReferenceList>();
-
+            GameObject.DontDestroyOnLoad(listSet);
             return listSet;
         }
         public static SmartDataContainerReferenceList CreateNewList(string name)
@@ -106,6 +106,7 @@ namespace BmxStreetsUI.Components
             list.OnValueChanged = new UnityEvent();
             list.OnDataChangeableChanged = new UnityEvent();
             list.OnValueChanged_DataValue = new SmartDataEvent();
+            GameObject.DontDestroyOnLoad(list);
             return list;
         }
         public static SmartData_Float CreateDefaultSmartFloat(string name)
@@ -119,11 +120,12 @@ namespace BmxStreetsUI.Components
             data.name = name + "_SmartObject";
             data.OnDataChangeableChanged = new UnityEvent();
             data.DataChangeableCallback = new BoolCallBackEvent();
+            data.DataChangeableCallback.AddListener(new System.Action<bool>((data) => { }));
             data.OnValueChanged_DataValue = new SmartDataEvent();
             data.OnValueChanged = new UnityEvent();
             data._visibilityCompare = SmartData.VisibilityCompare.EqualTo;
             data.referencedVisibilityValue = 0;
-            
+            GameObject.DontDestroyOnLoad(data);
             return data;
         }
 

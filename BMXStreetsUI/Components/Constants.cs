@@ -8,5 +8,7 @@
         public const string BMXInMenu = "BMX Showcase Body";
         public const string CharacterRootInMenu = "Character Manager";
         public const string CharacterSelectionPanel = "BMXS_Character Selection Menu";
+        public const string QuickMenu = "Quick Access Menu Canvas";
+        public const string QuickAccessMenuParent = "On Off Render Layer Root";
     }
 }

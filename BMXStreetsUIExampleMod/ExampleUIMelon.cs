@@ -11,7 +11,7 @@ namespace BMXStreetsUIExampleMod
     {
         public override void OnLateInitializeMelon()
         {
-            API.RegisterForUICreation(OnUIReady);
+            StreetsUI.RegisterForUICreation(OnUIReady);
         }
 
         // triggered by the API when the scene UI is loaded and ready
@@ -51,7 +51,6 @@ namespace BMXStreetsUIExampleMod
 
                 groups.Add(mygroup);
             }
-
             var myModMenu = new MenuPanel("MyMod", groups);
 
             var myOptionalPalette = new MenuPalette();
@@ -59,11 +58,15 @@ namespace BMXStreetsUIExampleMod
             myOptionalPalette.PanelTwo = Color.grey;
             myModMenu.palette = myOptionalPalette;
 
-            var myNewPanel = API.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
+            var myNewPanel = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
             LoggerInstance.Msg("AutosetupModmenuTab Complete");
+
+            var myQuickMenu = new MenuPanel("MyMod", groups);
+            var mySharedQuickPanel = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoTabSetup.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
+                                                                                                                                      // myModMenu must have its panel setup first or otherwise have its listSet property set on it's UIPanel component.
+            var quickButton = StreetsUI.CreateQuickMenuButton();
+            StreetsUI.LinkQuickButtonToUIPanel(quickButton, mySharedQuickPanel);
         }
-
-
 
         /// Different types of callbacks used by sliders,toggles etc
         void OnChangeValueFloat(float value)

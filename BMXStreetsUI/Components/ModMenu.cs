@@ -1,5 +1,6 @@
 ﻿using Il2Cpp;
 using Il2CppMG_UI.MenuSytem;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -12,8 +13,8 @@ namespace BmxStreetsUI.Components
         static int CharacterMenus { get { return CharacterBar != null ? CharacterBar.GetComponentsInChildren<MGMenu>().Count : 0; } }
         public static void ModMenuSetup(GameObject settingsTab)
         {
-            var modBar = API.CreateMenuBar();
-            var ModMenuTab = API.CreateTab("Mods",API.settingsTab.transform.parent);
+            var modBar = StreetsUI.CreateMenuBar();
+            var ModMenuTab = StreetsUI.CreateTab("Mods",StreetsUI.settingsTab.transform.parent);
             if (modBar == null || ModMenuTab == null)
             {
                 Log.Msg($"Error setting up ModMenu", true);
@@ -21,12 +22,12 @@ namespace BmxStreetsUI.Components
             }
             modBar.name = "StreetsUIModsMenu";
             var mg = modBar.GetComponent<MGMenu>();
-            API.LinkTabClickToAction(ModMenuTab, new Action(() => { modBar.SetActive(true); mg.OpenMenu(); }));
+            StreetsUI.LinkTabTriggerToAction(ModMenuTab, new Action(() => { modBar.SetActive(true); mg.OpenMenu(); }));
             ModMenu.modBar = modBar;
         }
         public static void CharacterMenuSetup()
         {
-            CharacterBar = API.CreateMenuBar();
+            CharacterBar = StreetsUI.CreateMenuBar();
             if (CharacterBar == null)
             {
                 Log.Msg($"Error setting up Character Menu", true);
@@ -41,54 +42,63 @@ namespace BmxStreetsUI.Components
             mg.OnCloseRaiseEvents = new Il2CppSystem.Collections.Generic.List<GameEvent>();
             mg.currentMenuSelectable = null;
             mg.isFirstMenu = false;
+            mg.enabled = true;
+            mg.Init();
+            if (mg.GetMenuSystem() != null)
+            {
+                mg.GetMenuSystem().Init();
+            }
+            MelonCoroutines.Start(AwaitCharacterSetup());
+        }
+        static System.Collections.IEnumerator AwaitCharacterSetup()
+        {
+            while(GameObject.FindObjectOfType<CharacterSelectionManager>() == null)
+            {
+                yield return new WaitForSeconds(1);
+            }
+            
+            OnCharacterUISetup();
+        }
+        static void OnCharacterUISetup()
+        {
+            var characterTab = GameObject.FindObjectsOfType<EventTrigger>(true).Where((EventTrigger trig) => { return trig.gameObject.name.Contains("CHARACTER"); }).First();
+            var mg = CharacterBar.GetComponent<MGMenu>();
+            foreach (var configPanel in GameObject.FindObjectsOfType<DataConfigPanel>(true).Where(dataconfig => dataconfig.gameObject.name.Contains(Constants.CharacterSelectionPanel)))
+            {
+                var characterMgMenu = configPanel.gameObject.GetComponent<MGMenu>();
+                characterMgMenu.currentMenuSelectable = null;
+                characterMgMenu.OnEnable();
+                characterMgMenu.OpenMenu();
+                configPanel.Start();
+                configPanel.Init();
+                configPanel.PopulateList();
+                characterMgMenu.OpenLastMenu();
+                characterMgMenu.OnDisable();
+                characterMgMenu.OnEnterOpen.RemoveListener(new System.Action(() => SetCharacterButtonTriggers(configPanel.gameObject, mg)));
+                characterMgMenu.OnEnterOpen.AddListener(new System.Action(() => { SetCharacterButtonTriggers(configPanel.gameObject, mg); }));
+                characterMgMenu.Init();
+                SetCharacterButtonTriggers(configPanel.gameObject, mg);
 
-            var characterTab = GameObject.FindObjectsOfType<EventTrigger>( true ).Where((EventTrigger trig) => { return trig.gameObject.name.Contains("CHARACTER"); }).First();
-            API.LinkTabClickToAction(characterTab.gameObject, new System.Action(() => 
-            { 
-                foreach (var configPanel in characterTab.GetComponentsInChildren<DataConfigPanel>(true).Where(dataconfig => dataconfig.gameObject.name.Contains(Constants.CharacterSelectionPanel)))
-                {
-                    //CharacterBar.gameObject.transform.SetParent(configPanel.transform.parent, false);
-                    var menu = configPanel.gameObject.GetComponent<MGMenu>();
-                    menu.OnEnterOpen = new UnityEngine.Events.UnityEvent();
-                    menu.OnEnterClose = new UnityEngine.Events.UnityEvent();
-                    menu.OnEnterOpen.RemoveListener(new System.Action(() => SetCharacterButtonTriggers(configPanel.gameObject, mg)));
-                    menu.OnEnterOpen.AddListener(new System.Action(() => SetCharacterButtonTriggers(configPanel.gameObject, mg)));
-                    SetCharacterButtonTriggers(configPanel.gameObject, mg);
-                
-                    configPanel.Start();
-                    configPanel.Validate();
-                    if(menu.OnOpenRaiseEvents!= null) menu.OnOpenRaiseEvents.Clear();
-
-                    break;
-                }
-                mg.Awake();
-                if(mg.GetMenuSystem() != null)
-                {
-                    mg.GetMenuSystem().Init();
-                }
-
-            }),false);
-
+                break;
+            }
         }
         static void SetCharacterButtonTriggers(GameObject TriggerParent,MGMenu mg)
         {
             foreach (var trigger in TriggerParent.GetComponentsInChildren<EventTrigger>(true))
             {
-                API.LinkTabClickToAction(trigger.gameObject, new System.Action(() => { mg.gameObject.SetActive(true); mg.OpenMenu(); }));
-                Log.Msg($"Added trigger for {trigger.gameObject.name}");
+                StreetsUI.LinkTabTriggerToAction(trigger.gameObject, new System.Action(() => { mg.gameObject.SetActive(true); mg.OpenMenu(); }),false);
             }
         }
         public static void AddToCharacterMenu(MenuPanel menu)
         {
             // auto align ui depending on existing children, setup gridLayout?
-            var tab = API.CreateTab(menu.TabTitle, CharacterBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
-            API.LinkTabClickToAction(tab, menu.panel.OnOpen);
+            var tab = StreetsUI.CreateTab(menu.TabTitle, CharacterBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
+            StreetsUI.LinkTabTriggerToAction(tab, menu.panel.OnOpen);
         }
         public static void AddToModMenu(MenuPanel newMenu)
         {
-            var tab = API.CreateTab(newMenu.TabTitle, modBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
-            
-            API.LinkTabClickToAction(tab, newMenu.panel.OnOpen);
+            var tab = StreetsUI.CreateTab(newMenu.TabTitle, modBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
+            StreetsUI.LinkTabTriggerToAction(tab, newMenu.panel.OnOpen);
         }
 
         public static Transform GetModMenuTabParent()

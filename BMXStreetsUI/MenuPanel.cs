@@ -29,7 +29,6 @@ namespace BmxStreetsUI
         public Action<int>? OnSelectionChange;
         public Action? OnSave;
         public Action? OnLoad;
-        public List<SmartDataContainerReferenceList> lists;
 
         /// <summary>
         /// loads data from locallow/Mash/Containers/{steamId}/{TabTitle}/{TabTitle}.container. Creates directory and file as needed, as each loaded value is matched with data in your menu, the options callback will fire with the loaded value.
@@ -45,10 +44,6 @@ namespace BmxStreetsUI
                 }
             }
             OnLoad?.Invoke();
-            foreach(var extra in lists)
-            {
-                extra.Save();
-            }
         }
         public void Save()
         {
@@ -60,10 +55,6 @@ namespace BmxStreetsUI
                 }
             }
             OnSave?.Invoke();
-            foreach (var extra in lists)
-            {
-                extra.Save();
-            }
         }
         public void SetPanelOnOpenCallback(Action<int> OnMenuOpened)
         {
@@ -110,7 +101,6 @@ namespace BmxStreetsUI
         { 
             this.TabTitle = title;
             this.Groups = groups;
-            this.lists = new List<SmartDataContainerReferenceList>();
         }
 
     }

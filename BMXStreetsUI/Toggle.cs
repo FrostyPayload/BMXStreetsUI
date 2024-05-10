@@ -20,7 +20,7 @@ namespace BmxStreetsUI
         internal override void OnCallBackValue(Il2CppSystem.Object obj)
         {
             base.OnCallBackValue(obj);
-            Log.Msg($"Toggle callback received");
+            //Log.Msg($"Toggle callback received");
             if (obj.GetIl2CppType() == Il2CppType.Of<float>())
             {
                 float value = obj.Unbox<float>();

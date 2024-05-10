@@ -27,11 +27,11 @@ namespace BmxStreetsUI.Components
         }
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
-            if (!API.IsReady)
+            if (!StreetsUI.IsReady)
             {
                 if (sceneName.ToLower().Contains(Constants.MainMenuSceneName))
                 {
-                    API.Initialize();
+                    StreetsUI.Initialize();
                 }
             }
         }
