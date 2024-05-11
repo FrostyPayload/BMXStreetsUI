@@ -1,16 +1,14 @@
 ﻿using Il2Cpp;
 using Il2CppMG_UI.MenuSytem;
-using MelonLoader;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine.Localization.Components;
 using Il2CppMichsky.UI.ModernUIPack;
 
 namespace BmxStreetsUI.Components
 {
-    [RegisterTypeInIl2Cpp]
+    [MelonLoader.RegisterTypeInIl2Cpp]
     public class UIPanel : MonoBehaviour
     {
         public UIPanel(IntPtr ptr) : base(ptr) { }
@@ -60,7 +58,7 @@ namespace BmxStreetsUI.Components
         public void SetNewDataSet(SmartDataContainerReferenceListSet set,bool keepCurrentTabIndex = true,bool keepCurrentOptionIndex = true)
         {
             listSet = set;
-            config.PopulateList();
+            SetupConfigPanel(PanelName);
         }
         public void SetNewDataList(SmartDataContainerReferenceList list,int indexToChange)
         {
@@ -72,24 +70,41 @@ namespace BmxStreetsUI.Components
             Log.Msg($"{PanelName} panel opening");
             if (menu.GetMenuSystem() == null)
             {
-                Log.Msg($"No menu System found in frostyUI OnOpen, GameObject {PanelName}", true);
+                Log.Msg($"No menu System found in UIPanel OnOpen, GameObject {PanelName}", true);
                 return;
             }
-            menu.OpenMenu();
             InputSystemEventCallback inputCancel = GetComponent<InputSystemEventCallback>();
             inputCancel.OnActionPerformed.RemoveAllListeners();
+            inputCancel.OnActionPerformedPositive.RemoveAllListeners();
             inputCancel.OnActionPerformed.AddListener(new System.Action(() => { OnClose(); }));
+
+            if (transform.parent.parent != null && transform.parent.parent.name == "Quick Access Menu Canvas")
+            {
+                var quickInput = transform.parent.parent.gameObject.GetComponent<InputSystemEventCallback>();
+                quickInput.OnActionPerformed.AddListener(new System.Action(() => { OnClose(); }));
+            }
+
             OnOpenEvent?.Invoke(config.currentDataIndex);
+            menu.OpenMenu();
         }
         public void OnClose()
         {
             Log.Msg($"{PanelName} panel closing");
-            menu.OpenLastMenu();
+            OnCloseEvent?.Invoke(config.currentDataIndex);
             InputSystemEventCallback inputCancel = GetComponent<InputSystemEventCallback>();
             inputCancel.OnActionPerformed.RemoveAllListeners();
             inputCancel.OnActionPerformedPositive.RemoveAllListeners();
-            gameObject.SetActive(false);
-            OnCloseEvent?.Invoke(config.currentDataIndex);
+
+            if(transform.parent.parent != null && transform.parent.parent.name == "Quick Access Menu Canvas")
+            {
+                var quickInput = transform.parent.parent.gameObject.GetComponent<InputSystemEventCallback>();
+                quickInput.OnActionPerformed.RemoveListener(new System.Action(() => { OnClose(); }));
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                menu.OpenLastMenu();
+            }
         }
         bool GetReferences()
         {
@@ -115,17 +130,7 @@ namespace BmxStreetsUI.Components
                     }
                 }
             }
-        }
-        public void ReInitMenuSystem()
-        {
-            if(menu != null && menu.gameObject.transform.parent != null)
-            {
-                var sys = menu.GetMenuSystem();
-                if(sys !=null)
-                {
-                    sys.Init();
-                }
-            }
+            menu.isFirstMenu = false;
         }
         public void ResetMenu()
         {

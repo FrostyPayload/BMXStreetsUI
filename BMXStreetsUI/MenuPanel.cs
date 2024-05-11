@@ -17,7 +17,7 @@ namespace BmxStreetsUI
         /// </summary>
         public List<OptionGroup> Groups;
         /// <summary>
-        /// The monoBehaviour on your panel
+        /// The monoBehaviour on your panel once created
         /// </summary>
         public UIPanel? panel;
         public MenuPalette palette;
@@ -26,10 +26,12 @@ namespace BmxStreetsUI
         public Action<int>? OnMenuOpen;
         public Action<int>? OnMenuClose;
         public Action<int>? OnTabChange;
+        /// <summary>
+        /// no support yet
+        /// </summary>
         public Action<int>? OnSelectionChange;
         public Action? OnSave;
         public Action? OnLoad;
-        public List<SmartDataContainerReferenceList> lists;
 
         /// <summary>
         /// loads data from locallow/Mash/Containers/{steamId}/{TabTitle}/{TabTitle}.container. Creates directory and file as needed, as each loaded value is matched with data in your menu, the options callback will fire with the loaded value.
@@ -37,7 +39,7 @@ namespace BmxStreetsUI
         /// </summary>
         public void Load()
         {
-            if (panel && panel.listSet)
+            if (panel!=null && panel.listSet!=null)
             {
                 foreach(var list in panel.listSet._DataRefLists)
                 {
@@ -45,14 +47,10 @@ namespace BmxStreetsUI
                 }
             }
             OnLoad?.Invoke();
-            foreach(var extra in lists)
-            {
-                extra.Save();
-            }
         }
         public void Save()
         {
-            if (panel && panel.listSet)
+            if (panel != null && panel.listSet!= null)
             {
                 foreach (var list in panel.listSet._DataRefLists)
                 {
@@ -60,48 +58,32 @@ namespace BmxStreetsUI
                 }
             }
             OnSave?.Invoke();
-            foreach (var extra in lists)
-            {
-                extra.Save();
-            }
         }
-        public void SetPanelOnOpenCallback(Action<int> OnMenuOpened)
+        internal void MenuOpenedEvent(int tab)
         {
-            if (panel)
-            {
-                panel.OnOpenEvent.RemoveListener(OnMenuOpened);
-                panel.OnOpenEvent.AddListener(OnMenuOpened);
-            }
+            OnMenuOpen?.Invoke(tab);
         }
-        public void SetPanelOnCloseCallback(Action<int> OnMenuClosed)
+        internal void MenuClosedEvent(int tab)
         {
-            if (panel)
-            {
-                panel.OnCloseEvent.RemoveListener(OnMenuClosed);
-                panel.OnCloseEvent.AddListener(OnMenuClosed);
-            }
+            OnMenuClose?.Invoke(tab);
         }
-        public void SetPanelOnTabChangedCallback(Action<int> Action)
+        internal void TabChangedEvent(int tab)
         {
-            if (panel)
-            {
-                panel.OnTabChangedEvent.RemoveListener(Action);
-                panel.OnTabChangedEvent.AddListener(Action);
-            }
+            OnTabChange?.Invoke(tab);
         }
-        public void SetPanelOnSelectionChangedCallback(Action<int> Action)
-        {
-            if (panel)
-            {
-                panel.OnSelectionChangedEvent.RemoveListener(Action);
-                panel.OnSelectionChangedEvent.AddListener(Action);
-            }
-        }
-
+        
+        /// <summary>
+        ///  Once the panel is setup, attempts to retreive the active groups data.
+        /// </summary>
+        /// <returns></returns>
         public SmartDataContainerReferenceList? GetCurrentDataList()
         {
             return panel!= null && panel.listSet != null && panel.config.currentConfigData != null ? panel.config.currentConfigData : null;
         }
+        /// <summary>
+        /// Once the panel is active, attempts to retreive the whole dataset.
+        /// </summary>
+        /// <returns></returns>
         public SmartDataContainerReferenceListSet? GetData()
         {
             return panel != null && panel.listSet != null && panel.config.currentConfigDatas != null ? panel.config.currentConfigDatas : null;
@@ -110,7 +92,6 @@ namespace BmxStreetsUI
         { 
             this.TabTitle = title;
             this.Groups = groups;
-            this.lists = new List<SmartDataContainerReferenceList>();
         }
 
     }

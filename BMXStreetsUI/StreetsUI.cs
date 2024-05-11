@@ -7,17 +7,18 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization.Components;
+using UnityEngine.UI;
 
 namespace BmxStreetsUI
 {
     /// <summary>
     /// Modders can use this API to easily add custom UI to the game and get callbacks to their own code
     /// </summary>
-    public static class API
+    public static class StreetsUI
     {
-        public static GameObject? settingsPanel, settingsTab,MainMenu;
-        public static Queue<Action> OnCreation = new Queue<Action>();
-        public static bool IsReady { get { return settingsTab != null && settingsPanel != null && MainMenu != null; } }
+        public static GameObject? settingsPanel, settingsTab,MainMenu,quickMenu;
+        static List<Action> OnCreation = new List<Action>();
+        public static bool IsReady { get { return settingsTab != null && settingsPanel != null && MainMenu != null && quickMenu != null; } }
 
         internal static void Initialize()
         {
@@ -45,15 +46,22 @@ namespace BmxStreetsUI
                 {
                     MainMenu = menu.gameObject;
                 }
+                foreach (var menu in GameObject.FindObjectsOfType<MGMenuSystem>(true).Where(menu => menu.gameObject.name == Constants.QuickMenu))
+                {
+                    quickMenu = menu.gameObject;
+                }
             }
 
             Components.ModMenu.ModMenuSetup(settingsTab);
             ModMenu.CharacterMenuSetup();
             CompleteAwaiting();
-            Log.Msg("AwaitUI Completed");
             
+            Log.Msg("Initialise Completed");
         }
-
+        /// <summary>
+        /// When the start button is pressed an the main menu opens, Requires API.IsReady to be true, use API.IsReady or RegisterForUICreation() to wait for this to be true.
+        /// </summary>
+        /// <param name="callback"></param>
         public static void RegisterToMainMenuOpen(Action callback)
         {
             if(MainMenu != null)
@@ -65,6 +73,10 @@ namespace BmxStreetsUI
                 }
             }
         }
+        /// <summary>
+        /// When the start button is pressed an the main menu closes, Requires API.IsReady to be true, use API.IsReady or RegisterForUICreation() to wait for this to be true.
+        /// </summary>
+        /// <param name="callback"></param>
         public static void RegisterToMainMenuClose(Action callback)
         {
             if (MainMenu != null)
@@ -108,6 +120,8 @@ namespace BmxStreetsUI
                 mg.OnCloseRaiseEvents.Clear();
                 mg.selectCurrentOnEnable = true;
                 mg.selectCurrentOnOpenMenu = true;
+                mg.currentMenuSelectable = null;
+                mg.isFirstMenu = false;
                 // destroy existing tabs
                 var toDestroyTabs = new Queue<GameObject>();
                 foreach(var child in ModMenu.GetComponentsInChildren<EventTrigger>(true))
@@ -141,7 +155,8 @@ namespace BmxStreetsUI
                 
                 input.OnActionPerformed.AddListener(new System.Action(() => {  mg.OpenLastMenu();  }));
                 input.RegisterAction();
-                
+
+                mg.OnDisable();
                 mg.Awake();
                 mg.GetMenuSystem().Init();
                 
@@ -152,18 +167,21 @@ namespace BmxStreetsUI
         static void CompleteAwaiting()
         {
             Log.Msg($"Running OnCreation callbacks");
-            while(OnCreation.Count>0)
+            foreach(var uijob in OnCreation)
             {
                 try
                 {
-                    OnCreation.Dequeue().Invoke();
+                    uijob.Invoke();
                 }
                 catch(Exception ex)
                 {
                     Log.Msg($"Setup error on creation: {ex}",true);
                 }
             }  
-            OnCreation.TrimExcess();
+            if(EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(settingsTab);
+            }
         }
         /// <summary>
         /// If API.IsReady is false when your mod is checking (before the UI exists) you can register a callback here to start your mods code
@@ -171,9 +189,13 @@ namespace BmxStreetsUI
         /// <param name="callback"></param>
         public static void RegisterForUICreation(Action callback)
         {
-            OnCreation.Enqueue(callback);
+            OnCreation.Add(callback);
         }
-
+        /// <summary>
+        /// The returned object is the full package of data used by the UIPanel to create it's menu when opened with events setup. Mash's DataConfigPanel is the ultimate endpoint it needs to reach.
+        /// </summary>
+        /// <param name="menu"></param>
+        /// <returns></returns>
         public static SmartDataContainerReferenceListSet MenuToSmartSet(MenuPanel menu)
         {
             var listSet = SmartDataManager.CreateNewSet(menu.TabTitle);
@@ -231,59 +253,50 @@ namespace BmxStreetsUI
             smartList._dataContainer = container;
             smartList.dataGroup = container._smartDatas;
             smartList.OnSelected = new UnityEvent();
-            if (group.SelectCallBack != null) smartList.OnSelected.AddListener(group.SelectCallBack);
-
+            
             return smartList;
         }
 
-        public static GameObject? CreatePanel(MenuPanel newMenu,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu,bool SetupSaveOnMainMenuExit = true,bool LoadOnCreate = true)
+        public static GameObject? CreatePanel(MenuPanel newMenu, AutoTabSetup tabSetup = AutoTabSetup.ToModMenu, bool SetupSaveOnMainMenuExit = true, bool LoadOnCreate = true, MenuPanel? shareDataWith = null)
         {
-            if (IsReady)
-            {
-                Log.Msg($"Setting up new StreetsUI");
-                var Panel = UnityEngine.Object.Instantiate(settingsPanel);
-                if (Panel == null)
-                {
-                    return null;
-                }
-                var UIPanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
-                UIPanel.Init();
-                var listSet = MenuToSmartSet(newMenu);
-                UIPanel.PanelName = newMenu.TabTitle;
-                UIPanel.listSet = listSet;
-                newMenu.panel = UIPanel;
-                UIPanel.transform.SetParent(settingsPanel.transform.parent, false);
+            if (!IsReady) return null;
 
-                if (newMenu.overridePallete) UIPanel.SetPallete(newMenu.palette);
-
-               
-                if (tabSetup == AutoTabSetup.ToMainMenu)
-                {
-                    var tab = CreateTab(newMenu.TabTitle);
-                    LinkTabClickToAction(tab, newMenu.panel.OnOpen);
-                }
-                else if(tabSetup == AutoTabSetup.ToModMenu)
-                {
-                    Components.ModMenu.AddToModMenu(newMenu);
-                }
-                else if(tabSetup == AutoTabSetup.ToCharacter)
-                {
-                    ModMenu.AddToCharacterMenu(newMenu);
-                }
-                if (tabSetup != AutoTabSetup.Custom) UIPanel.RunSetup();
-                if(newMenu.OnMenuOpen != null) newMenu.SetPanelOnOpenCallback(newMenu.OnMenuOpen);
-                if (newMenu.OnMenuClose != null) newMenu.SetPanelOnCloseCallback(newMenu.OnMenuClose);
-                if (newMenu.OnTabChange != null) newMenu.SetPanelOnTabChangedCallback(newMenu.OnTabChange);
-                if (newMenu.OnSelectionChange != null) newMenu.SetPanelOnSelectionChangedCallback(newMenu.OnSelectionChange);
-                if (SetupSaveOnMainMenuExit) RegisterToMainMenuClose(new System.Action(() => { newMenu.Save(); }));
-                if (LoadOnCreate) newMenu.Load();
-                return Panel;
-            }
-            else
+            Log.Msg($"Setting up new StreetsUI");
+            var Panel = UnityEngine.Object.Instantiate(settingsPanel);
+            if (Panel == null)
             {
-                ///
                 return null;
             }
+            var uipanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
+            newMenu.panel = uipanel;
+            var parentTo = tabSetup == AutoTabSetup.ToQuickAccess ? quickMenu.transform.FindDeepChild(Constants.QuickAccessMenuParent) : settingsPanel.transform.parent;
+            uipanel.transform.SetParent(parentTo, false);
+            uipanel.Init();
+            uipanel.listSet = shareDataWith == null ? MenuToSmartSet(newMenu) : shareDataWith.panel.listSet;
+            uipanel.PanelName = newMenu.TabTitle;
+
+            if (newMenu.overridePallete) uipanel.SetPallete(newMenu.palette);
+
+            if (tabSetup == AutoTabSetup.ToMainMenu)
+            {
+                var tab = CreateTab(newMenu.TabTitle);
+                LinkTabTriggerToAction(tab, newMenu.panel.OnOpen);
+            }
+            else if (tabSetup == AutoTabSetup.ToModMenu)
+            {
+                Components.ModMenu.AddToModMenu(newMenu);
+            }
+            else if (tabSetup == AutoTabSetup.ToCharacter)
+            {
+                ModMenu.AddToCharacterMenu(newMenu);
+            }
+            if (tabSetup != AutoTabSetup.Custom) uipanel.RunSetup();
+            uipanel.OnOpenEvent.AddListener(new System.Action<int>((val) => { newMenu.MenuOpenedEvent(val); }));
+            uipanel.OnCloseEvent.AddListener(new System.Action<int>((val) => { newMenu.MenuClosedEvent(val); }));
+            uipanel.OnTabChangedEvent.AddListener(new System.Action<int>((val) => { newMenu.TabChangedEvent(val); }));
+            if (SetupSaveOnMainMenuExit) RegisterToMainMenuClose(new System.Action(() => { Log.Msg($"{newMenu.TabTitle} Saving");  newMenu.Save(); }));
+            if (LoadOnCreate) newMenu.Load();
+            return Panel;
         }
 
         /// <summary>
@@ -307,60 +320,103 @@ namespace BmxStreetsUI
             return tab;
         }
 
+        public static GameObject? CreateQuickMenuButton(string name = "",string spriteName = "Lightbulb")
+        {
+            var settingsbutton = quickMenu.transform.FindDeepChild("Settings").gameObject;
+            if (settingsbutton != null)
+            {
+                var newButton = GameObject.Instantiate(settingsbutton);
+                newButton.name = name == "" ? "StreetsUIQuickMenuButton" : name;
+                var img = newButton.GetComponentInChildren<Image>();
+                var btn = newButton.GetComponent<UnityEngine.UI.Button>();
+                btn.onClick.RemoveAllListeners();
+                btn.m_OnClick.RemoveAllListeners();
+                GameObject.DestroyImmediate(newButton.GetComponentInChildren<UnityGameEventListener>().gameObject);
+                var sprite = Resources.FindObjectsOfTypeAll<Sprite>().Where((sprite)=> { return sprite.name.Contains(spriteName); });
+                if(sprite != null)
+                {
+                    img.sprite = sprite.FirstOrDefault();
+                }
+                newButton.transform.SetParent(settingsbutton.transform.parent, false);
+                // decouple
+                LinkTabTriggerToAction(newButton, new System.Action(() => { Log.Msg($"UnLinked button clicked"); }));
+                return newButton;
+            }
+            return null;
+        }
+
        /// <summary>
        /// Hook into the Submit events of the tab
        /// </summary>
        /// <param name="triggerObj"></param>
        /// <param name="action"></param>
        /// <param name="deleteOthers"></param>
-        public static void LinkTabClickToAction(GameObject triggerObj, Action action, bool deleteOthers = true)
+        public static void LinkTabTriggerToAction(GameObject triggerObj, Action action, bool deleteOthers = true)
         {
             EventTrigger trigger = triggerObj.GetComponent<EventTrigger>();
-            foreach (var trig in trigger.triggers)
+            if(!deleteOthers )
             {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                EventTrigger.Entry entry = new EventTrigger.Entry();
+                entry.eventID = EventTriggerType.Submit;
+                entry.callback.AddListener(new System.Action<BaseEventData>((data) => { action.Invoke(); }));
+                //trigger.triggers.Add(entry);
+                trigger.delegates.Add(entry);
+            }
+            else
+            {
+                foreach (var trig in trigger.triggers)
                 {
-                    if (deleteOthers)
+                    if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
                     {
-                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
+                        if (deleteOthers)
                         {
-                            trig.callback.m_PersistentCalls.RemoveListener(0);
+                            trig.callback.RemoveAllListeners();
                         }
-                        trig.callback.RemoveAllListeners();
+                        //trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                     }
-                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                 }
-            }
-            foreach (var trig in trigger.delegates)
-            {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                foreach (var trig in trigger.delegates)
                 {
-                    if (deleteOthers)
-                    { 
-                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
-                        {
-                            trig.callback.m_PersistentCalls.RemoveListener(0);
+                    if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                    {
+                        if (deleteOthers)
+                        { 
+                            trig.callback.RemoveAllListeners();
                         }
-                        trig.callback.RemoveAllListeners();
+                        trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                     }
-                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                 }
             }
+            trigger.MarkDirty();
+            trigger.Finalize();
+        }
+        public static void LinkTabTriggerToUIPanel(GameObject tab, GameObject uiPanel)
+        {
+            if(uiPanel.GetComponent<MGMenu>() != null)
+            {
+                LinkTabTriggerToAction(tab, new System.Action(() => { uiPanel.SetActive(true); uiPanel.GetComponent<UIPanel>().OnOpen(); }));
+            }
+        }
+        public static void LinkQuickButtonToAction(GameObject button, Action action)
+        {
+            var uibutton = button.GetComponent<UnityEngine.UI.Button>();
+            if (uibutton == null)
+            {
+                return;
+            }
+            uibutton.onClick.RemoveAllListeners();
+            uibutton.m_OnClick.RemoveAllListeners();
+            uibutton.onClick.AddListener(action);
 
         }
-        public static void LinkTabClickToMenuOpen(GameObject tab, GameObject menu)
+        public static void LinkQuickButtonToUIPanel(GameObject button, GameObject uiPanel)
         {
-            if(menu.GetComponent<MGMenu>() != null)
-            {
-                LinkTabClickToAction(tab, new System.Action(() => { menu.GetComponent<MGMenu>().OpenMenu(); }));
-            }
+            LinkQuickButtonToAction(button,new System.Action(() => { uiPanel.SetActive(true); uiPanel.GetComponent<UIPanel>().OnOpen(); }));
         }
 
         public enum AutoTabSetup
         {
-            ToMainMenu,ToModMenu,ToCharacter,Custom
+            ToMainMenu,ToModMenu,ToCharacter,ToQuickAccess,Custom
         }
         public enum SystemTab
         {

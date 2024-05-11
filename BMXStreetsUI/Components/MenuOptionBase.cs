@@ -35,6 +35,7 @@
         internal Action<Il2CppSystem.Object> ValueCallBack { get; private set; }
         internal Action SelectCallBack { get; private set; }
         internal Action DeSelectCallBack { get; private set; }
+        
         internal void SetUIStyle(UIStyle style)
         {
             UIStyle = style;
@@ -46,11 +47,11 @@
         /// <param name="callback"></param>
         internal virtual void OnCallBackValue(Il2CppSystem.Object obj)
         {
-            Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()}");
+           // Log.Msg($"OnCallBackValue received with type {obj.GetIl2CppType().ToString()}");
         }
         internal virtual void OnCallBack()
         {
-            Log.Msg($"OnCallBack received");
+           // Log.Msg($"OnCallBack received");
         }
         internal virtual float GetMax()
         {
@@ -67,6 +68,11 @@
         internal virtual Il2CppSystem.Collections.Generic.List<string> GetLabels()
         {
             return new Il2CppSystem.Collections.Generic.List<string>();
+        }
+
+        public void SetOptionChangable(bool enable)
+        {
+
         }
         /// <summary>
         /// Set a callback to happen when this option becomes the highlighted selection in the UI
