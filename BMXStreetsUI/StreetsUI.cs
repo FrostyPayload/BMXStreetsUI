@@ -253,57 +253,50 @@ namespace BmxStreetsUI
             smartList._dataContainer = container;
             smartList.dataGroup = container._smartDatas;
             smartList.OnSelected = new UnityEvent();
-            if (group.SelectCallBack != null) smartList.OnSelected.AddListener(group.SelectCallBack);
-
+            
             return smartList;
         }
 
-        public static GameObject? CreatePanel(MenuPanel newMenu,AutoTabSetup tabSetup = AutoTabSetup.ToModMenu,bool SetupSaveOnMainMenuExit = true,bool LoadOnCreate = true, MenuPanel? shareDataWith = null)
+        public static GameObject? CreatePanel(MenuPanel newMenu, AutoTabSetup tabSetup = AutoTabSetup.ToModMenu, bool SetupSaveOnMainMenuExit = true, bool LoadOnCreate = true, MenuPanel? shareDataWith = null)
         {
-            if (IsReady)
-            {
-                Log.Msg($"Setting up new StreetsUI");
-                var Panel = UnityEngine.Object.Instantiate(settingsPanel);
-                if (Panel == null)
-                {
-                    return null;
-                }
-                var UIPanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
-                var parentTo = tabSetup == AutoTabSetup.ToQuickAccess ? quickMenu.transform.FindDeepChild(Constants.QuickAccessMenuParent) : settingsPanel.transform.parent;
-                UIPanel.transform.SetParent(parentTo, false);
-                UIPanel.Init();
-                UIPanel.listSet = shareDataWith == null ? MenuToSmartSet(newMenu) : shareDataWith.panel.listSet;
-                UIPanel.PanelName = newMenu.TabTitle;
-                
-                newMenu.panel = UIPanel;
-                if (newMenu.overridePallete) UIPanel.SetPallete(newMenu.palette);
+            if (!IsReady) return null;
 
-                if (tabSetup == AutoTabSetup.ToMainMenu)
-                {
-                    var tab = CreateTab(newMenu.TabTitle);
-                    LinkTabTriggerToAction(tab, newMenu.panel.OnOpen);
-                }
-                else if(tabSetup == AutoTabSetup.ToModMenu)
-                {
-                    Components.ModMenu.AddToModMenu(newMenu);
-                }
-                else if(tabSetup == AutoTabSetup.ToCharacter)
-                {
-                    ModMenu.AddToCharacterMenu(newMenu);
-                }
-                if (tabSetup != AutoTabSetup.Custom) UIPanel.RunSetup();
-                if(newMenu.OnMenuOpen != null) newMenu.SetPanelOnOpenCallback(newMenu.OnMenuOpen);
-                if (newMenu.OnMenuClose != null) UIPanel.OnCloseEvent.AddListener(newMenu.OnMenuClose);
-                if (newMenu.OnTabChange != null) newMenu.SetPanelOnTabChangedCallback(newMenu.OnTabChange);
-                if (newMenu.OnSelectionChange != null) newMenu.SetPanelOnSelectionChangedCallback(newMenu.OnSelectionChange);
-                if (SetupSaveOnMainMenuExit) RegisterToMainMenuClose(new System.Action(() => { Log.Msg($"{newMenu.TabTitle} Saving");  newMenu.Save(); }));
-                if (LoadOnCreate) newMenu.Load();
-                return Panel;
-            }
-            else
+            Log.Msg($"Setting up new StreetsUI");
+            var Panel = UnityEngine.Object.Instantiate(settingsPanel);
+            if (Panel == null)
             {
                 return null;
             }
+            var uipanel = Panel.AddComponent<UIPanel>(); // cant inherit and use virtuals?
+            newMenu.panel = uipanel;
+            var parentTo = tabSetup == AutoTabSetup.ToQuickAccess ? quickMenu.transform.FindDeepChild(Constants.QuickAccessMenuParent) : settingsPanel.transform.parent;
+            uipanel.transform.SetParent(parentTo, false);
+            uipanel.Init();
+            uipanel.listSet = shareDataWith == null ? MenuToSmartSet(newMenu) : shareDataWith.panel.listSet;
+            uipanel.PanelName = newMenu.TabTitle;
+
+            if (newMenu.overridePallete) uipanel.SetPallete(newMenu.palette);
+
+            if (tabSetup == AutoTabSetup.ToMainMenu)
+            {
+                var tab = CreateTab(newMenu.TabTitle);
+                LinkTabTriggerToAction(tab, newMenu.panel.OnOpen);
+            }
+            else if (tabSetup == AutoTabSetup.ToModMenu)
+            {
+                Components.ModMenu.AddToModMenu(newMenu);
+            }
+            else if (tabSetup == AutoTabSetup.ToCharacter)
+            {
+                ModMenu.AddToCharacterMenu(newMenu);
+            }
+            if (tabSetup != AutoTabSetup.Custom) uipanel.RunSetup();
+            uipanel.OnOpenEvent.AddListener(new System.Action<int>((val) => { newMenu.MenuOpenedEvent(val); }));
+            uipanel.OnCloseEvent.AddListener(new System.Action<int>((val) => { newMenu.MenuClosedEvent(val); }));
+            uipanel.OnTabChangedEvent.AddListener(new System.Action<int>((val) => { newMenu.TabChangedEvent(val); }));
+            if (SetupSaveOnMainMenuExit) RegisterToMainMenuClose(new System.Action(() => { Log.Msg($"{newMenu.TabTitle} Saving");  newMenu.Save(); }));
+            if (LoadOnCreate) newMenu.Load();
+            return Panel;
         }
 
         /// <summary>
@@ -361,36 +354,37 @@ namespace BmxStreetsUI
         public static void LinkTabTriggerToAction(GameObject triggerObj, Action action, bool deleteOthers = true)
         {
             EventTrigger trigger = triggerObj.GetComponent<EventTrigger>();
-            foreach (var trig in trigger.triggers)
+            if(!deleteOthers )
             {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
-                {
-                    if (deleteOthers)
-                    {
-                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
-                        {
-                            trig.callback.m_PersistentCalls.RemoveListener(0);
-                        }
-                        trig.callback.RemoveAllListeners();
-                    }
-                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
-                }
+                EventTrigger.Entry entry = new EventTrigger.Entry();
+                entry.eventID = EventTriggerType.Submit;
+                entry.callback.AddListener(new System.Action<BaseEventData>((data) => { action.Invoke(); }));
+                //trigger.triggers.Add(entry);
+                trigger.delegates.Add(entry);
             }
-            foreach (var trig in trigger.delegates)
+            else
             {
-                if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                foreach (var trig in trigger.triggers)
                 {
-                    if (deleteOthers)
-                    { 
-                        if (trig.callback.m_PersistentCalls != null && trig.callback.m_PersistentCalls.Count > 0)
+                    if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                    {
+                        if (deleteOthers)
                         {
-                            trig.callback.m_PersistentCalls.RemoveListener(0);
+                            trig.callback.RemoveAllListeners();
                         }
-                        trig.callback.RemoveAllListeners();
+                        //trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
                     }
-                    trig.callback.RemoveListener(new System.Action<BaseEventData>(data => action.Invoke()));
-                    trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
+                }
+                foreach (var trig in trigger.delegates)
+                {
+                    if (trig.eventID == EventTriggerType.Submit | trig.eventID == EventTriggerType.PointerClick)
+                    {
+                        if (deleteOthers)
+                        { 
+                            trig.callback.RemoveAllListeners();
+                        }
+                        trig.callback.AddListener(new System.Action<BaseEventData>(data => action.Invoke()));
+                    }
                 }
             }
             trigger.MarkDirty();

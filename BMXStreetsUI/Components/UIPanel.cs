@@ -27,15 +27,12 @@ namespace BmxStreetsUI.Components
 
         public UnityEvent<int> OnOpenEvent, OnCloseEvent,OnTabChangedEvent,OnSelectionChangedEvent;
 
-        public SmartDataContainerReferenceListSet extraListSet;
         public void Init()
         {
             OnOpenEvent = new UnityEvent<int>();
             OnCloseEvent = new UnityEvent<int>();
             OnTabChangedEvent = new UnityEvent<int>();
             OnSelectionChangedEvent = new UnityEvent<int>();
-            extraListSet = SmartDataManager.CreateNewSet($"{PanelName}_ExtraSet_ListSet");
-            DontDestroyOnLoad(extraListSet);
             var content = transform.FindDeepChild("Content");
             foreach (var trans in content.GetComponentsInChildren<Transform>(true))
             {

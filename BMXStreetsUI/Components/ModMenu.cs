@@ -48,45 +48,28 @@ namespace BmxStreetsUI.Components
             {
                 mg.GetMenuSystem().Init();
             }
-            MelonCoroutines.Start(AwaitCharacterSetup());
-        }
-        static System.Collections.IEnumerator AwaitCharacterSetup()
-        {
-            while(GameObject.FindObjectOfType<CharacterSelectionManager>() == null)
-            {
-                yield return new WaitForSeconds(1);
-            }
-            
-            OnCharacterUISetup();
-        }
-        static void OnCharacterUISetup()
-        {
+
             var characterTab = GameObject.FindObjectsOfType<EventTrigger>(true).Where((EventTrigger trig) => { return trig.gameObject.name.Contains("CHARACTER"); }).First();
+            StreetsUI.LinkTabTriggerToAction(characterTab.gameObject, OnCharacterButtonClick, false);
+
+        }
+        static void OnCharacterButtonClick()
+        {
+            Log.Msg($"Character button clicked");
             var mg = CharacterBar.GetComponent<MGMenu>();
             foreach (var configPanel in GameObject.FindObjectsOfType<DataConfigPanel>(true).Where(dataconfig => dataconfig.gameObject.name.Contains(Constants.CharacterSelectionPanel)))
             {
                 var characterMgMenu = configPanel.gameObject.GetComponent<MGMenu>();
-                characterMgMenu.currentMenuSelectable = null;
-                characterMgMenu.OnEnable();
-                characterMgMenu.OpenMenu();
-                configPanel.Start();
-                configPanel.Init();
-                configPanel.PopulateList();
-                characterMgMenu.OpenLastMenu();
-                characterMgMenu.OnDisable();
-                characterMgMenu.OnEnterOpen.RemoveListener(new System.Action(() => SetCharacterButtonTriggers(configPanel.gameObject, mg)));
-                characterMgMenu.OnEnterOpen.AddListener(new System.Action(() => { SetCharacterButtonTriggers(configPanel.gameObject, mg); }));
-                characterMgMenu.Init();
-                SetCharacterButtonTriggers(configPanel.gameObject, mg);
-
+                MelonCoroutines.Start(WaitThenHookButtons(configPanel.gameObject,mg));
                 break;
             }
         }
-        static void SetCharacterButtonTriggers(GameObject TriggerParent,MGMenu mg)
+        static System.Collections.IEnumerator WaitThenHookButtons(GameObject triggerParent, MGMenu mg)
         {
-            foreach (var trigger in TriggerParent.GetComponentsInChildren<EventTrigger>(true))
+            yield return new WaitForSeconds(1f);
+            foreach (var trigger in triggerParent.GetComponentsInChildren<EventTrigger>(true))
             {
-                StreetsUI.LinkTabTriggerToAction(trigger.gameObject, new System.Action(() => { mg.gameObject.SetActive(true); mg.OpenMenu(); }),false);
+                StreetsUI.LinkTabTriggerToAction(trigger.gameObject, new System.Action(() => { mg.gameObject.SetActive(true); mg.OpenMenu(); }), true);
             }
         }
         public static void AddToCharacterMenu(MenuPanel menu)
