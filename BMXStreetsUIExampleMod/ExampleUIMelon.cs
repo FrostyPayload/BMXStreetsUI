@@ -1,6 +1,7 @@
 ﻿using MelonLoader;
 using BmxStreetsUI;
 using UnityEngine;
+using Il2CppMG_UI.MenuSytem;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon),"BMXStreetsUIExampleMod", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -9,6 +10,8 @@ namespace BMXStreetsUIExampleMod
 {
     public class ExampleUIMelon : MelonMod
     {
+        GameObject? mainMenu;
+        GameObject? quickMenu;
         public override void OnLateInitializeMelon()
         {
             StreetsUI.RegisterForUICreation(OnUIReady);
@@ -58,32 +61,50 @@ namespace BMXStreetsUIExampleMod
             myOptionalPalette.PanelTwo = Color.grey;
             myModMenu.palette = myOptionalPalette;
 
-            var myNewPanel = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
+            mainMenu = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
             LoggerInstance.Msg("AutosetupModmenuTab Complete");
 
             var myQuickMenu = new MenuPanel("MyMod", groups);
-            var mySharedQuickPanel = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoTabSetup.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
+            quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoTabSetup.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
                                                                                                                                       // myModMenu must have its panel setup first or otherwise have its listSet property set on it's UIPanel component.
             var quickButton = StreetsUI.CreateQuickMenuButton();
-            StreetsUI.LinkQuickButtonToUIPanel(quickButton, mySharedQuickPanel);
+            StreetsUI.LinkQuickButtonToUIPanel(quickButton, quickMenu);
+            StreetsUI.NewNotification("Example mod", "Example Inital setup notification");
         }
 
         /// Different types of callbacks used by sliders,toggles etc
         void OnChangeValueFloat(float value)
         {
+            if (!AMenuIsOpen()) return;
             LoggerInstance.Msg($"MyFloatCallBack : {value}");
         }
         void OnChangeValueBool(bool value)
         {
+            if (!AMenuIsOpen()) return;
             LoggerInstance.Msg($"MyBoolCallBack : {value}");
         }
         void OnChangeValueInt(int value)
         {
+            if (!AMenuIsOpen()) return;
             LoggerInstance.Msg($"MyIntCallBack : {value}");
         }
         public void OnClick()
         {
+            if (!AMenuIsOpen()) return;
             LoggerInstance.Msg("My Callback");
+            StreetsUI.NewNotification("Example Mod", "OnButton Clicked Notification");
+        }
+        bool AMenuIsOpen()
+        {
+            if(mainMenu!= null)
+            {
+                if (mainMenu.activeInHierarchy) return true;
+            }
+            if (quickMenu != null)
+            {
+                if (quickMenu.activeInHierarchy) return true;
+            }
+            return false;
         }
     }
 }

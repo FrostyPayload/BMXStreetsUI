@@ -164,6 +164,11 @@ namespace BmxStreetsUI
             }
             return null;
         }
+        public static void NewNotification(string title,string message,float lifetime = 3f)
+        {
+            if(!IsReady) return;
+            settingsPanel.GetComponent<DataConfigPanel>()._smartUIManagerData.InstantiateNotification(title, message, lifetime);
+        }
         static void CompleteAwaiting()
         {
             Log.Msg($"Running OnCreation callbacks");
