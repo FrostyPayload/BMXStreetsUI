@@ -14,13 +14,12 @@ namespace BmxStreetsUI
         /// <summary>
         /// Sliders, Toggles, Buttons and SteppedInt's all go in here
         /// </summary>
-        public List<MenuOptionBase> options;
+        public List<OptionBase> options;
         public OptionGroup(string GroupTitle)
         {
             this.title = GroupTitle;
-            options = new List<MenuOptionBase>();
+            options = new List<OptionBase>();
         }
        
-        
     }
 }

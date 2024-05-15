@@ -6,7 +6,7 @@ namespace BmxStreetsUI
     /// <summary>
     /// You provide a list of strings to display, the index of the selection is sent back to you on change of the value;
     /// </summary>
-    public class SteppedInt : MenuOptionBase
+    public class SteppedInt : OptionBase
     {
         Action<int>? IntCallback;
         public Il2CppSystem.Collections.Generic.List<string> choices;

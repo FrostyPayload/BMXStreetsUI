@@ -3,9 +3,9 @@
     /// <summary>
     /// The base class which sliders,toggles,buttons,steppedInt's inherit from.
     /// </summary>
-    public abstract class MenuOptionBase
+    public abstract class OptionBase
     {
-        public MenuOptionBase(string title, string description = "",float defaultValue = 0)
+        public OptionBase(string title, string description = "",float defaultValue = 0)
         {
             this.title = title;
             this.description = description;
@@ -33,9 +33,7 @@
         /// derived classes override the target of this
         /// </summary>
         internal Action<Il2CppSystem.Object> ValueCallBack { get; private set; }
-        internal Action SelectCallBack { get; private set; }
-        internal Action DeSelectCallBack { get; private set; }
-        
+       
         internal void SetUIStyle(UIStyle style)
         {
             UIStyle = style;
@@ -70,26 +68,6 @@
             return new Il2CppSystem.Collections.Generic.List<string>();
         }
 
-        public void SetOptionChangable(bool enable)
-        {
-
-        }
-        /// <summary>
-        /// Set a callback to happen when this option becomes the highlighted selection in the UI
-        /// </summary>
-        /// <param name="actionWhenSelected"></param>
-        public void SetOnSelected(Action actionWhenSelected)
-        {
-            this.SelectCallBack = actionWhenSelected;
-        }
-        /// <summary>
-        /// Set a callback for when this option stops being the chosen selection in the UI
-        /// </summary>
-        /// <param name="actionWhenDeSelected"></param>
-        public void SetOnDeSelected(Action actionWhenDeSelected)
-        {
-            this.DeSelectCallBack = actionWhenDeSelected;
-        }
     }
     public enum UIStyle { Button, Toggle, Slider, SteppedInt }
 

@@ -3,7 +3,7 @@ using Il2CppInterop.Runtime;
 
 namespace BmxStreetsUI
 {
-    public class Toggle : MenuOptionBase
+    public class Toggle : OptionBase
     {
         Action<bool> boolCallback;
         public Toggle(string title, string description = "",bool defaultValue = false) : base(title, description, defaultValue == true ? 1 : 0)

@@ -20,8 +20,6 @@ namespace BmxStreetsUI
         /// The monoBehaviour on your panel once created
         /// </summary>
         public UIPanel? panel;
-        public MenuPalette palette;
-        public bool overridePallete;
         
         public Action<int>? OnMenuOpen;
         public Action<int>? OnMenuClose;
