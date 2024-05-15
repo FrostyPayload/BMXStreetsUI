@@ -6,7 +6,7 @@ namespace BmxStreetsUI
     /// <summary>
     /// Give a name, max and min value and callback. Calls back with value on change
     /// </summary>
-    public class Slider : MenuOptionBase
+    public class Slider : OptionBase
     {
         Action<float> floatcallback;
         public float max, min;

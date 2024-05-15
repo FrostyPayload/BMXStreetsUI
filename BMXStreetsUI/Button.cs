@@ -2,7 +2,7 @@
 
 namespace BmxStreetsUI
 {
-    public class Button : MenuOptionBase
+    public class Button : OptionBase
     {
         public Button(string title, string description = "") : base(title, description)
         {

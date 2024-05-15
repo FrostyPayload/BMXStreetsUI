@@ -6,7 +6,7 @@ namespace BmxStreetsUI.Components
 {
     public class SmartDataManager
     {
-        public static SmartData SetupSmartUI(SmartData_Float data, string identifyer, MenuOptionBase option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
+        public static SmartData SetupSmartUI(SmartData_Float data, string identifyer, OptionBase option, SmartDataFloatStuct.DataStyle style, SmartData.DataUIStyle uiStyle)
         {
             data._description = option.description;
             data._dataUIStyle = uiStyle;
@@ -14,26 +14,28 @@ namespace BmxStreetsUI.Components
             data.OnBelowSignificantValue = new UnityEvent();
             data.OnSignificantValueCrossed = new UnityEvent();
             data.OnSteppedLabelListChanged = new UnityEvent();
+            data._hasDefaultValue = option.defaultValue != 0;
             var SmartType = data._mData;
             var FloatData = SmartType._value;
             FloatData.SetMin(option.GetMin());
             FloatData.SetMax(option.GetMax());
             FloatData._dataStyle = style;
             SmartType._dataUnit = option.DataUnit;
-            //FloatData.displayDecimalAccuracy = 5;
-            //FloatData.decimalVal = option.decimalPlaces;
-            //data._needsDecimalAccuracy = option.decimalPlaces > 0 ? true : false;
+            //FloatData.displayDecimalAccuracy = 3;
+            FloatData.decimalVal = new Il2CppSystem.Decimal(option.defaultValue);
+            //data._needsDecimalAccuracy = true;
             SmartType._identifyer = identifyer;
             SmartType._label = option.title;
-            FloatData.Value = 0;
+            FloatData.Value = option.defaultValue;
             FloatData._clampMinMax = true;
             FloatData._wrapMinMax = false;
             SmartType._value = FloatData;
+            data.SetData(SmartType);
+           // data.SetDataValue(data._defaultValue);
+            data.EnableDataChangeable();
             data.OnValueChanged_DataValue.AddListener(option.ValueCallBack);
             data.OnValueChanged.AddListener(option.VoidCallBack);
-            data.EnableDataChangeable();
 
-            data.SetData(SmartType);
             if(uiStyle == SmartData.DataUIStyle.Stepped)
             {
                 data.steppedLabelList = ScriptableObject.CreateInstance<CategoryListScriptableObject>();
@@ -45,7 +47,7 @@ namespace BmxStreetsUI.Components
             }
             return data;
         }
-        public static SmartData SetupButton(SmartData_Button data, MenuOptionBase option)
+        public static SmartData SetupButton(SmartData_Button data, OptionBase option)
         {
             var SmartType = data._mData;
             var btnData = SmartType._value;

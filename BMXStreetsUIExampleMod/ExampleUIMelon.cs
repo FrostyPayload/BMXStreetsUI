@@ -2,6 +2,7 @@
 using BmxStreetsUI;
 using UnityEngine;
 using Il2CppMG_UI.MenuSytem;
+using Il2Cpp;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon),"BMXStreetsUIExampleMod", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -16,7 +17,7 @@ namespace BMXStreetsUIExampleMod
         {
             StreetsUI.RegisterForUICreation(OnUIReady);
         }
-
+       
         // triggered by the API when the scene UI is loaded and ready
         void OnUIReady()
         {
@@ -46,7 +47,7 @@ namespace BMXStreetsUIExampleMod
                 mysteppedInt.choices.Add("Choice two");
                 mysteppedInt.choices.Add("Choice three");
                 mysteppedInt.SetCallBack(OnChangeValueInt);
-
+                
                 mygroup.options.Add(myslider);
                 mygroup.options.Add(myButton);
                 mygroup.options.Add(myToggle);
@@ -56,18 +57,14 @@ namespace BMXStreetsUIExampleMod
             }
             var myModMenu = new MenuPanel("MyMod", groups);
 
-            var myOptionalPalette = new MenuPalette();
-            myOptionalPalette.PanelOne = Color.green;
-            myOptionalPalette.PanelTwo = Color.grey;
-            myModMenu.palette = myOptionalPalette;
 
             mainMenu = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
-            LoggerInstance.Msg("AutosetupModmenuTab Complete");
+            LoggerInstance.Msg("AutoSetupModMenuTab Complete");
 
             var myQuickMenu = new MenuPanel("MyMod", groups);
-            quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoTabSetup.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
+            quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoSetupOption.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
                                                                                                                                       // myModMenu must have its panel setup first or otherwise have its listSet property set on it's UIPanel component.
-            var quickButton = StreetsUI.CreateQuickMenuButton();
+            var quickButton = StreetsUI.CreateQuickMenuButton("ExampleModQuickButton");
             StreetsUI.LinkQuickButtonToUIPanel(quickButton, quickMenu);
             StreetsUI.NewNotification("Example mod", "Example Inital setup notification");
         }
@@ -94,7 +91,7 @@ namespace BMXStreetsUIExampleMod
             LoggerInstance.Msg("My Callback");
             StreetsUI.NewNotification("Example Mod", "OnButton Clicked Notification");
         }
-        bool AMenuIsOpen()
+        bool AMenuIsOpen() // Once callbacks become linked to SmartData, and load is called, all SmartData OnValueChanged callbacks fire with the loaded values whether your receiving code is ready for that or not. Happy with those bike builds you made are you?
         {
             if(mainMenu!= null)
             {
