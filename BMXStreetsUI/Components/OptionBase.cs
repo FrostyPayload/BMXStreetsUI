@@ -53,11 +53,11 @@
         }
         internal virtual float GetMax()
         {
-            return 1;
+            return 1.00f;
         }
         internal virtual float GetMin()
         {
-            return 0;
+            return 0.00f;
         }
         /// <summary>
         /// Toggles and steppedInt's are powered by this list,max and min are set by the count. Toggles simply give back on and off labels and return 0 or 1

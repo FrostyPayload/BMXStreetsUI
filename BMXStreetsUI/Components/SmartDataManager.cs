@@ -27,6 +27,7 @@ namespace BmxStreetsUI.Components
             SmartType._identifyer = identifyer;
             SmartType._label = option.title;
             FloatData.Value = option.defaultValue;
+            FloatData.decimalVal = new Il2CppSystem.Decimal(option.defaultValue);
             FloatData._clampMinMax = true;
             FloatData._wrapMinMax = false;
             SmartType._value = FloatData;

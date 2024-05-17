@@ -20,6 +20,32 @@ namespace BmxStreetsUI
         static List<Action> OnCreation = new List<Action>();
         public static bool IsReady { get { return settingsTab != null && settingsPanel != null && MainMenu != null && quickMenu != null; } }
 
+        public static bool VersionNotAcceptable()
+        {
+            string minVer = "1.0.0.136.0";
+            string versionString = Application.version;
+            // Find the first occurrence of "[" and "]"
+            int startIndex = versionString.IndexOf('[');
+            int endIndex = versionString.IndexOf(']');
+
+            // Extract the substring between "[" and "]"
+            string versionNumber = versionString.Substring(startIndex + 1, endIndex - startIndex - 1);
+
+            var notAcceptable = versionNumber.CompareTo(minVer) < 0;
+            if (notAcceptable)
+            {
+                string[] answers = new string[] 
+                { 
+                    "Failed to find any D.I.G entries for rider", 
+                    "Major internal error",
+                    "Couldn't initiate UI"
+                };
+                var r = UnityEngine.Random.Range(0, answers.Length);
+                Log.Msg($"{answers[r]}, MelonLoader version 0.6.2 or higher required",true);
+            }
+
+            return notAcceptable;
+        }
         internal static void Initialize()
         {
             Log.Msg($"API Initialize");

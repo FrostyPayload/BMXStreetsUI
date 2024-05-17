@@ -15,26 +15,14 @@ namespace BmxStreetsUI.Components
             Log.logger = LoggerInstance;
         }
         
-        bool VersionNotAcceptable()
-        {
-            string minVer = "1.0.0.136.0";
-            string versionString = Application.version;
-            // Find the first occurrence of "[" and "]"
-            int startIndex = versionString.IndexOf('[');
-            int endIndex = versionString.IndexOf(']');
-
-            // Extract the substring between "[" and "]"
-            string versionNumber = versionString.Substring(startIndex + 1, endIndex - startIndex - 1);
-
-            return versionNumber.CompareTo(minVer) < 0;
-        }
+        
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             if (!StreetsUI.IsReady)
             {
                 if (sceneName.ToLower().Contains(Constants.MainMenuSceneName))
                 {
-                    if (VersionNotAcceptable())
+                    if (StreetsUI.VersionNotAcceptable())
                     {
                         LoggerInstance.Error($"BMXStreetsUI shut down due to internal error");
                         return;
