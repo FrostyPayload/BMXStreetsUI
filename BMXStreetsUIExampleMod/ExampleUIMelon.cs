@@ -1,8 +1,6 @@
 ﻿using MelonLoader;
 using BmxStreetsUI;
 using UnityEngine;
-using Il2CppMG_UI.MenuSytem;
-using Il2Cpp;
 
 [assembly: MelonInfo(typeof(BMXStreetsUIExampleMod.ExampleUIMelon),"BMXStreetsUIExampleMod", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -13,6 +11,7 @@ namespace BMXStreetsUIExampleMod
     {
         GameObject? mainMenu;
         GameObject? quickMenu;
+        GameObject? characterMenu;
         public override void OnLateInitializeMelon()
         {
             StreetsUI.RegisterForUICreation(OnUIReady);
@@ -34,7 +33,6 @@ namespace BMXStreetsUIExampleMod
 
                 var myslider = new Slider("MySlider", 0, 50);
                 myslider.SetCallBack(OnChangeValueFloat);
-                myslider.decimalPlaces = 3;
 
                 var myButton = new Button("Mybutton", "My Buttons Description");
                 myButton.SetCallBack(OnClick);
@@ -55,21 +53,23 @@ namespace BMXStreetsUIExampleMod
 
                 groups.Add(mygroup);
             }
+
             var myModMenu = new MenuPanel("MyMod", groups);
-
-
-            mainMenu = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoTabSetup enum to customize
-            LoggerInstance.Msg("AutoSetupModMenuTab Complete");
-
             var myQuickMenu = new MenuPanel("MyMod", groups);
-            quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoSetupOption.ToQuickAccess, true, true, myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
-                                                                                                                                      // myModMenu must have its panel setup first or otherwise have its listSet property set on it's UIPanel component.
-            var quickButton = StreetsUI.CreateQuickMenuButton("ExampleModQuickButton");
-            StreetsUI.LinkQuickButtonToUIPanel(quickButton, quickMenu);
-            StreetsUI.NewNotification("Example mod", "Example Inital setup notification");
+            var myCharacterMenu = new MenuPanel("MyMod", groups);
+            mainMenu = StreetsUI.CreatePanel(myModMenu); // auto setup to modmenu by default. pass in a AutoSetupOption enum to customize
+
+            quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoSetupOption.ToQuickAccess, true, true,"Lightbulb", myModMenu); // passing in our mod menu will cause the returned panel to be setup with the exact same data, causing the panels to be synced.
+                                                                                                                                        // myModMenu must have its panel setup first or otherwise have its listSet property set on it's UIPanel component.
+            
+            characterMenu = StreetsUI.CreatePanel(myCharacterMenu, StreetsUI.AutoSetupOption.ToCharacter, true, true, "", myModMenu); // The sprite string is only used for quick menu button's
+
+            LoggerInstance.Msg("AutoSetupModMenuTab Complete");
+            StreetsUI.NewNotification("Example mod", "Example inital setup notification");
         }
 
-        /// Different types of callbacks used by sliders,toggles etc
+        
+        /// Different types of callbacks used by sliders,toggles,steppedInt's and buttons
         void OnChangeValueFloat(float value)
         {
             if (!AMenuIsOpen()) return;
@@ -91,7 +91,10 @@ namespace BMXStreetsUIExampleMod
             LoggerInstance.Msg("My Callback");
             StreetsUI.NewNotification("Example Mod", "OnButton Clicked Notification");
         }
-        bool AMenuIsOpen() // Once callbacks become linked to SmartData, and load is called, all SmartData OnValueChanged callbacks fire with the loaded values whether your receiving code is ready for that or not. Happy with those bike builds you made are you?
+
+        // Once callbacks become linked to SmartData's OnValueChanged event, and load is called for instance, all SmartData OnValueChanged callbacks fire with the loaded values whether your receiving code is ready for that or not.
+        // nice bike build you got there.
+        bool AMenuIsOpen()
         {
             if(mainMenu!= null)
             {

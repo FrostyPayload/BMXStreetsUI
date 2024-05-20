@@ -310,6 +310,7 @@ namespace BmxStreetsUI
             
             return smartList;
         }
+
         /// <summary>
         /// Creates Panels for all use cases
         /// </summary>
@@ -319,7 +320,7 @@ namespace BmxStreetsUI
         /// <param name="LoadOnCreate"></param>
         /// <param name="shareDataWith"></param>
         /// <returns></returns>
-        public static GameObject? CreatePanel(MenuPanel newMenu, AutoSetupOption tabSetup = AutoSetupOption.ToModMenu, bool SetupSaveOnMainMenuExit = true, bool LoadOnCreate = true, MenuPanel? shareDataWith = null)
+        public static GameObject? CreatePanel(MenuPanel newMenu, AutoSetupOption tabSetup = AutoSetupOption.ToModMenu, bool SetupSaveOnMainMenuExit = true, bool LoadOnCreate = true,string spriteName = "LightBulb", MenuPanel? shareDataWith = null)
         {
             if (!IsReady) return null;
 
@@ -341,6 +342,7 @@ namespace BmxStreetsUI
             uipanel.listSet = shareDataWith == null ? MenuToSmartSet(newMenu) : shareDataWith.panel.listSet;
             uipanel.PanelName = newMenu.TabTitle;
 
+            // auto tab setups
             if (tabSetup == AutoSetupOption.ToMainMenu)
             {
                 var tab = CreateTab(newMenu.TabTitle);
@@ -356,8 +358,8 @@ namespace BmxStreetsUI
             }
             else if (tabSetup == AutoSetupOption.ToQuickAccess)
             {
-                //var button = CreateQuickMenuButton(newMenu.TabTitle);
-                //LinkQuickButtonToUIPanel(button, Panel);
+                var button = CreateQuickMenuButton(newMenu.TabTitle, spriteName);
+                LinkQuickButtonToUIPanel(button, Panel);
             }
 
             if (tabSetup != AutoSetupOption.Custom) uipanel.RunSetup();
@@ -390,7 +392,7 @@ namespace BmxStreetsUI
         }
         /// <summary>
         /// The name you pass here should just identify the button gameobject uniquely in the context of the other quickbuttons parented to the quick menu bar. This is because the quick menu itself and buttons dont unload
-        /// when the game goes to the loading screen. To fix this, when this function runs, it first destroys any existing buttons that match the name given.
+        /// when the game goes to the title screen but the data does. To fix this, when this function runs, it first destroys any existing buttons that match the name given.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="spriteName"></param>
@@ -427,7 +429,7 @@ namespace BmxStreetsUI
             return null;
         }
        /// <summary>
-       /// Hook into the Submit events of the tab
+       /// Hook into the Submit events of the trigger component found on tabs
        /// </summary>
        /// <param name="triggerObj"></param>
        /// <param name="action"></param>
@@ -480,13 +482,11 @@ namespace BmxStreetsUI
             trigger.MarkDirty();
             trigger.Finalize();
         }
-        public static void LinkTabTriggerToUIPanel(GameObject tab, GameObject uiPanel)
-        {
-            if(uiPanel.GetComponent<MGMenu>() != null)
-            {
-                LinkTabTriggerToAction(tab, new System.Action(() => { uiPanel.SetActive(true); uiPanel.GetComponent<UIPanel>().OnOpen(); }));
-            }
-        }
+        /// <summary>
+        /// The buttons in quick menu use the UI.Button instead of eventtrigger's
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="action"></param>
         public static void LinkQuickButtonToAction(GameObject button, Action action)
         {
             var uibutton = button.GetComponent<UnityEngine.UI.Button>();
@@ -499,11 +499,15 @@ namespace BmxStreetsUI
             uibutton.onClick.AddListener(action);
 
         }
+        /// <summary>
+        /// Easy way to link a panel to a quick button once created
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="uiPanel"></param>
         public static void LinkQuickButtonToUIPanel(GameObject button, GameObject uiPanel)
         {
             LinkQuickButtonToAction(button,new System.Action(() => { uiPanel.SetActive(true); uiPanel.GetComponent<UIPanel>().OnOpen(); }));
         }
-
         public enum AutoSetupOption
         {
             ToMainMenu,ToModMenu,ToCharacter,ToQuickAccess,Custom

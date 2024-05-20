@@ -1,4 +1,6 @@
-﻿namespace BmxStreetsUI.Components
+﻿using Il2Cpp;
+
+namespace BmxStreetsUI.Components
 {
     /// <summary>
     /// The base class which sliders,toggles,buttons,steppedInt's inherit from.
@@ -22,7 +24,10 @@
         /// </summary>
         public string description;
         public float defaultValue;
-        public int decimalPlaces = 1;
+        /// <summary>
+        /// Take a look at the static members of the DataUnits class in the game's codebase. This string determines the measurement displayed next to your value
+        /// but also defines how the value is displayed. for example, a value here of "m" indicating metres causing the decimal places to be displayed.
+        /// </summary>
         public string DataUnit;
         internal UIStyle UIStyle { get; private set; }
         /// <summary>

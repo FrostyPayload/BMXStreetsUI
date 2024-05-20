@@ -15,24 +15,24 @@ namespace BmxStreetsUI.Components
             data.OnSignificantValueCrossed = new UnityEvent();
             data.OnSteppedLabelListChanged = new UnityEvent();
             data._hasDefaultValue = option.defaultValue != 0;
+
             var SmartType = data._mData;
+            SmartType._dataUnit = option.DataUnit;
+            SmartType._identifyer = identifyer;
+            SmartType._label = option.title;
+
             var FloatData = SmartType._value;
             FloatData.SetMin(option.GetMin());
             FloatData.SetMax(option.GetMax());
             FloatData._dataStyle = style;
-            SmartType._dataUnit = option.DataUnit;
-            //FloatData.displayDecimalAccuracy = 3;
             FloatData.decimalVal = new Il2CppSystem.Decimal(option.defaultValue);
-            //data._needsDecimalAccuracy = true;
-            SmartType._identifyer = identifyer;
-            SmartType._label = option.title;
             FloatData.Value = option.defaultValue;
-            FloatData.decimalVal = new Il2CppSystem.Decimal(option.defaultValue);
             FloatData._clampMinMax = true;
             FloatData._wrapMinMax = false;
+
             SmartType._value = FloatData;
             data.SetData(SmartType);
-           // data.SetDataValue(data._defaultValue);
+
             data.EnableDataChangeable();
             data.OnValueChanged_DataValue.AddListener(option.ValueCallBack);
             data.OnValueChanged.AddListener(option.VoidCallBack);

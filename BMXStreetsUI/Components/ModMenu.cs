@@ -11,7 +11,7 @@ namespace BmxStreetsUI.Components
         static GameObject modBar,CharacterBar;
         static int ModMenus { get { return modBar != null ? modBar.GetComponentsInChildren<MGMenu>().Count : 0; } }
         static int CharacterMenus { get { return CharacterBar != null ? CharacterBar.GetComponentsInChildren<MGMenu>().Count : 0; } }
-        public static void ModMenuSetup(GameObject settingsTab)
+        internal static void ModMenuSetup(GameObject settingsTab)
         {
             var modBar = StreetsUI.CreateMenuBar();
             var ModMenuTab = StreetsUI.CreateTab("Mods",StreetsUI.settingsTab.transform.parent);
@@ -25,7 +25,7 @@ namespace BmxStreetsUI.Components
             StreetsUI.LinkTabTriggerToAction(ModMenuTab, new Action(() => { modBar.SetActive(true); mg.OpenMenu(); }));
             ModMenu.modBar = modBar;
         }
-        public static void CharacterMenuSetup()
+        internal static void CharacterMenuSetup()
         {
             CharacterBar = StreetsUI.CreateMenuBar();
             if (CharacterBar == null)
@@ -83,7 +83,6 @@ namespace BmxStreetsUI.Components
             var tab = StreetsUI.CreateTab(newMenu.TabTitle, modBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform);
             StreetsUI.LinkTabTriggerToAction(tab, newMenu.panel.OnOpen);
         }
-
         public static Transform GetModMenuTabParent()
         {
             return modBar.GetComponentInChildren<MenuTabGroup>(true).gameObject.transform;

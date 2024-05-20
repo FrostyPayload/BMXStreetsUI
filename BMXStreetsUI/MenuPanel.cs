@@ -4,7 +4,7 @@ using Il2Cpp;
 namespace BmxStreetsUI
 {
     /// <summary>
-    /// Create an instance of this with your list of groups and a tab name, then register it with API.AddMenu();
+    /// Create an instance of this with your list of groups and a Title, then register it with StreetsUI.CreatePanel();
     /// </summary>
     public class MenuPanel
     {

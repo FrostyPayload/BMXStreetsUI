@@ -55,16 +55,7 @@ namespace BmxStreetsUI.Components
             SetupSelectors();
             SetupConfigPanel(PanelName);
         }
-        public void SetNewDataSet(SmartDataContainerReferenceListSet set,bool keepCurrentTabIndex = true,bool keepCurrentOptionIndex = true)
-        {
-            listSet = set;
-            SetupConfigPanel(PanelName);
-        }
-        public void SetNewDataList(SmartDataContainerReferenceList list,int indexToChange)
-        {
-
-        }
-        
+       
         public void OnOpen()
         {
             Log.Msg($"{PanelName} panel opening");
@@ -188,15 +179,6 @@ namespace BmxStreetsUI.Components
         {
             Debug.Log($"On Change tab {value}");
             OnTabChangedEvent?.Invoke(config.currentDataIndex);
-        }
-        public void SetPallete(MenuPalette pallete)
-        {
-            Log.Msg("Setting up pallete");
-            config._smartUIManagerData._paletteData.panelColor_01 = pallete.PanelOne;
-            config._smartUIManagerData._paletteData.panelColor_02 = pallete.PanelTwo;
-            config._smartUIManagerData._paletteData.selectableGraphicColorSet_01 = new UnityEngine.UI.ColorBlock { normalColor = pallete.TextNormal, highlightedColor = pallete.TextHighlighted, pressedColor = pallete.TextSelected };
-            config._smartUIManagerData._paletteData.InvokeDataChangedEvent();
-            config._smartUIManagerData.InvokePaletteChangeEvent();
         }
        
     }

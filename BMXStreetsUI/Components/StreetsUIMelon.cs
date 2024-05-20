@@ -1,7 +1,7 @@
 ﻿using BmxStreetsUI.Components;
 using Il2CppTriangleNet;
 using MelonLoader;
-using UnityEngine;
+
 
 [assembly: MelonInfo(typeof(StreetsUIMelon), "BmxStreetsUI", "1.0.0", "FrostyP/LineRyder")]
 [assembly: MelonGame()]
@@ -15,7 +15,6 @@ namespace BmxStreetsUI.Components
             Log.logger = LoggerInstance;
         }
         
-        
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             if (!StreetsUI.IsReady)
@@ -24,15 +23,11 @@ namespace BmxStreetsUI.Components
                 {
                     if (StreetsUI.VersionNotAcceptable())
                     {
-                        LoggerInstance.Error($"BMXStreetsUI shut down due to internal error");
                         return;
                     }
-
                     StreetsUI.Initialize();
                 }
             }
         }
-
     }
-
 }
