@@ -31,7 +31,7 @@ All UI elements have a title, description and defaultValue argument in their con
 - Title: The text next to your option's value.
 - Description : The presence of data in this string will cause the info panel to show this string when the option is highlighted.
 - DefaultValue : The initial value set in the underlying `SmartData`
-- DataUnit : Optionally set the text displayed next to your value as it's unit of measure.
+- DataUnit : Optionally set the text displayed next to your value as it's unit of measure. Note: this string also defines decimal places shown e.g a value of "m" for metres will display 2 decimal places. See the game's DataUnits class for more info
 <br></br>
 ## Register for Creation of UI:
 ```
@@ -43,7 +43,7 @@ All UI elements have a title, description and defaultValue argument in their con
  // triggered by the API when the scene UI is loaded and ready
  void OnUIReady()
  {
-     AutoModMenuPanel();
+     CreateMyUIPanel();
  }
 ```
 The Main UI only spawns in when the main world loads in. To simplify this, mods can use the StreetsUI.RegisterForUICreation method to register a void callback. This not only let's your mod execute as soon as the UI becomes available
@@ -55,7 +55,7 @@ all UI mods. This is worth keeping in mind when designing how your mod set's its
 ## Quick Setup
 
 ```
- void AutoModMenuPanel()
+ void CreateMyUIPanel()
  {
      var groups = new List<OptionGroup>();
      var mygroup = new OptionGroup($"My option set");
@@ -93,21 +93,10 @@ all UI mods. This is worth keeping in mind when designing how your mod set's its
 ## Quick Menu
 ```
  var myQuickMenu = new MenuPanel("MyMod", groups);
- quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoSetupOption.ToQuickAccess, true, true, myModMenu);
-                                                                                                                          
- var quickButton = StreetsUI.CreateQuickMenuButton();
- StreetsUI.LinkQuickButtonToUIPanel(quickButton, quickMenu);
+ quickMenu = StreetsUI.CreatePanel(myQuickMenu, StreetsUI.AutoSetupOption.ToQuickAccess, true, true, myModMenu);          
+ 
 ```
-Setting up a QuickMenu consists of:
-- Passing the `ToQuickAccess` enum to CreatePanel()
-- Creating a Quick menu button
-- Run LinkQuickButtonToUIPanel
-  
-`CreateQuickMenuButton()` has arguments for the `name` to give to the object and `spriteName` for the name of the sprite to attempt to find and load in. The returned object is
-the new button's GameObject in the quickmenu heirarchy. This GameObject has a UnityEngine UI Image in it's children which hosts the Sprite.
-<br></br>
 Note the <b>original</b> menu being passed in to the creation of the quick menu. The presence of a created MenuPanel in this argument will cause the menu being created to use the same data in it's menu.
-the created panel
 <br></br>
 <br></br>
 ## Notifications
